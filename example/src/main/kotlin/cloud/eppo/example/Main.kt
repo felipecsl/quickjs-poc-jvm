@@ -25,26 +25,23 @@ fun main() {
     }
   }
   context.setConsole(console)
+  val eppoBundle = Main::class.java.getResourceAsStream("/index.js")?.bufferedReader()?.readText()
   val script = """
-    function add(a, b) {
-      return a + b;
-    }
-    function sub(a, b) {
-      return a - b;
-    }
-    class EppoCalculator {
-      constructor() {
-      }
-      add(a, b) {
-        return add(a, b);
-      }
-      sub(a, b) {
-        return sub(a, b);
-      }
-    }
-    const calc = new EppoCalculator();
-    console.log(calc.sub(calc.add(10, 25), 5));
+    console.log(eppoSdk.getInstance());
   """.trimIndent()
-  context.evaluate(script)
+  if (eppoBundle != null) {
+    context.evaluate("$eppoBundle\n$script")
+  } else {
+    throw RuntimeException("Failed to load script")
+  }
   println("All set!")
+}
+
+class Main {
+  companion object {
+    @JvmStatic
+    fun main(args: Array<String>) {
+      main()
+    }
+  }
 }
