@@ -1,4 +1,4 @@
-"use strict";
+import * as os from 'os';
 let eppoSdk = null;
 (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -272,7 +272,7 @@ let eppoSdk = null;
             }
             if (transmit2) {
               this._logEvent = createLogEventShape(
-                [].concat(parent._logEvent.bindings, bindings)
+                  [].concat(parent._logEvent.bindings, bindings)
               );
             }
           }
@@ -335,12 +335,7 @@ let eppoSdk = null;
         return bindings.reverse();
       }
       function set(self2, opts, rootLogger, level) {
-        Object.defineProperty(self2, level, {
-          value: levelToValue(self2.level, rootLogger) > levelToValue(level, rootLogger) ? noop : rootLogger[baseLogFunctionSymbol][level],
-          writable: true,
-          enumerable: true,
-          configurable: true
-        });
+        self2[level] = levelToValue(self2.level, rootLogger) > levelToValue(level, rootLogger) ? noop : rootLogger[baseLogFunctionSymbol][level];
         if (!opts.transmit && self2[level] === noop) {
           return;
         }
@@ -433,10 +428,10 @@ let eppoSdk = null;
         const val = opts.val;
         const bindings = logger._logEvent.bindings;
         applySerializers(
-          args,
-          logger._serialize || Object.keys(logger.serializers),
-          logger.serializers,
-          logger._stdErrSerialize === void 0 ? true : logger._stdErrSerialize
+            args,
+            logger._serialize || Object.keys(logger.serializers),
+            logger.serializers,
+            logger._stdErrSerialize === void 0 ? true : logger._stdErrSerialize
         );
         logger._logEvent.ts = ts;
         logger._logEvent.messages = args.filter(function(arg) {
@@ -575,6 +570,255 @@ let eppoSdk = null;
         }
       };
       exports.LRUCache = LRUCache;
+    }
+  });
+
+  // node_modules/js-base64/base64.js
+  var require_base64 = __commonJS({
+    "node_modules/js-base64/base64.js"(exports, module) {
+      (function(global2, factory) {
+        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (
+            // cf. https://github.com/dankogai/js-base64/issues/119
+            function() {
+              var _Base64 = global2.Base64;
+              var gBase64 = factory();
+              gBase64.noConflict = function() {
+                global2.Base64 = _Base64;
+                return gBase64;
+              };
+              if (global2.Meteor) {
+                Base64 = gBase64;
+              }
+              global2.Base64 = gBase64;
+            }()
+        );
+      })(typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : exports, function() {
+        "use strict";
+        var version = "3.7.7";
+        var VERSION = version;
+        var _hasBuffer = typeof Buffer === "function";
+        var _TD = typeof TextDecoder === "function" ? new TextDecoder() : void 0;
+        var _TE = typeof TextEncoder === "function" ? new TextEncoder() : void 0;
+        var b64ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        var b64chs = Array.prototype.slice.call(b64ch);
+        var b64tab = function(a) {
+          var tab = {};
+          a.forEach(function(c, i) {
+            return tab[c] = i;
+          });
+          return tab;
+        }(b64chs);
+        var b64re = /^(?:[A-Za-z\d+\/]{4})*?(?:[A-Za-z\d+\/]{2}(?:==)?|[A-Za-z\d+\/]{3}=?)?$/;
+        var _fromCC = String.fromCharCode.bind(String);
+        var _U8Afrom = typeof Uint8Array.from === "function" ? Uint8Array.from.bind(Uint8Array) : function(it) {
+          return new Uint8Array(Array.prototype.slice.call(it, 0));
+        };
+        var _mkUriSafe = function(src) {
+          return src.replace(/=/g, "").replace(/[+\/]/g, function(m0) {
+            return m0 == "+" ? "-" : "_";
+          });
+        };
+        var _tidyB64 = function(s) {
+          return s.replace(/[^A-Za-z0-9\+\/]/g, "");
+        };
+        var btoaPolyfill = function(bin) {
+          var u32, c0, c1, c2, asc = "";
+          var pad = bin.length % 3;
+          for (var i = 0; i < bin.length; ) {
+            if ((c0 = bin.charCodeAt(i++)) > 255 || (c1 = bin.charCodeAt(i++)) > 255 || (c2 = bin.charCodeAt(i++)) > 255)
+              throw new TypeError("invalid character found");
+            u32 = c0 << 16 | c1 << 8 | c2;
+            asc += b64chs[u32 >> 18 & 63] + b64chs[u32 >> 12 & 63] + b64chs[u32 >> 6 & 63] + b64chs[u32 & 63];
+          }
+          return pad ? asc.slice(0, pad - 3) + "===".substring(pad) : asc;
+        };
+        var _btoa = typeof btoa === "function" ? function(bin) {
+          return btoa(bin);
+        } : _hasBuffer ? function(bin) {
+          return Buffer.from(bin, "binary").toString("base64");
+        } : btoaPolyfill;
+        var _fromUint8Array = _hasBuffer ? function(u8a) {
+          return Buffer.from(u8a).toString("base64");
+        } : function(u8a) {
+          var maxargs = 4096;
+          var strs = [];
+          for (var i = 0, l = u8a.length; i < l; i += maxargs) {
+            strs.push(_fromCC.apply(null, u8a.subarray(i, i + maxargs)));
+          }
+          return _btoa(strs.join(""));
+        };
+        var fromUint8Array = function(u8a, urlsafe) {
+          if (urlsafe === void 0) {
+            urlsafe = false;
+          }
+          return urlsafe ? _mkUriSafe(_fromUint8Array(u8a)) : _fromUint8Array(u8a);
+        };
+        var cb_utob = function(c) {
+          if (c.length < 2) {
+            var cc = c.charCodeAt(0);
+            return cc < 128 ? c : cc < 2048 ? _fromCC(192 | cc >>> 6) + _fromCC(128 | cc & 63) : _fromCC(224 | cc >>> 12 & 15) + _fromCC(128 | cc >>> 6 & 63) + _fromCC(128 | cc & 63);
+          } else {
+            var cc = 65536 + (c.charCodeAt(0) - 55296) * 1024 + (c.charCodeAt(1) - 56320);
+            return _fromCC(240 | cc >>> 18 & 7) + _fromCC(128 | cc >>> 12 & 63) + _fromCC(128 | cc >>> 6 & 63) + _fromCC(128 | cc & 63);
+          }
+        };
+        var re_utob = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g;
+        var utob = function(u) {
+          return u.replace(re_utob, cb_utob);
+        };
+        var _encode = _hasBuffer ? function(s) {
+          return Buffer.from(s, "utf8").toString("base64");
+        } : _TE ? function(s) {
+          return _fromUint8Array(_TE.encode(s));
+        } : function(s) {
+          return _btoa(utob(s));
+        };
+        var encode = function(src, urlsafe) {
+          if (urlsafe === void 0) {
+            urlsafe = false;
+          }
+          return urlsafe ? _mkUriSafe(_encode(src)) : _encode(src);
+        };
+        var encodeURI = function(src) {
+          return encode(src, true);
+        };
+        var re_btou = /[\xC0-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF7][\x80-\xBF]{3}/g;
+        var cb_btou = function(cccc) {
+          switch (cccc.length) {
+            case 4:
+              var cp = (7 & cccc.charCodeAt(0)) << 18 | (63 & cccc.charCodeAt(1)) << 12 | (63 & cccc.charCodeAt(2)) << 6 | 63 & cccc.charCodeAt(3), offset = cp - 65536;
+              return _fromCC((offset >>> 10) + 55296) + _fromCC((offset & 1023) + 56320);
+            case 3:
+              return _fromCC((15 & cccc.charCodeAt(0)) << 12 | (63 & cccc.charCodeAt(1)) << 6 | 63 & cccc.charCodeAt(2));
+            default:
+              return _fromCC((31 & cccc.charCodeAt(0)) << 6 | 63 & cccc.charCodeAt(1));
+          }
+        };
+        var btou = function(b) {
+          return b.replace(re_btou, cb_btou);
+        };
+        var atobPolyfill = function(asc) {
+          asc = asc.replace(/\s+/g, "");
+          if (!b64re.test(asc))
+            throw new TypeError("malformed base64.");
+          asc += "==".slice(2 - (asc.length & 3));
+          var u24, bin = "", r1, r2;
+          for (var i = 0; i < asc.length; ) {
+            u24 = b64tab[asc.charAt(i++)] << 18 | b64tab[asc.charAt(i++)] << 12 | (r1 = b64tab[asc.charAt(i++)]) << 6 | (r2 = b64tab[asc.charAt(i++)]);
+            bin += r1 === 64 ? _fromCC(u24 >> 16 & 255) : r2 === 64 ? _fromCC(u24 >> 16 & 255, u24 >> 8 & 255) : _fromCC(u24 >> 16 & 255, u24 >> 8 & 255, u24 & 255);
+          }
+          return bin;
+        };
+        var _atob = typeof atob === "function" ? function(asc) {
+          return atob(_tidyB64(asc));
+        } : _hasBuffer ? function(asc) {
+          return Buffer.from(asc, "base64").toString("binary");
+        } : atobPolyfill;
+        var _toUint8Array = _hasBuffer ? function(a) {
+          return _U8Afrom(Buffer.from(a, "base64"));
+        } : function(a) {
+          return _U8Afrom(_atob(a).split("").map(function(c) {
+            return c.charCodeAt(0);
+          }));
+        };
+        var toUint8Array = function(a) {
+          return _toUint8Array(_unURI(a));
+        };
+        var _decode = _hasBuffer ? function(a) {
+          return Buffer.from(a, "base64").toString("utf8");
+        } : _TD ? function(a) {
+          return _TD.decode(_toUint8Array(a));
+        } : function(a) {
+          return btou(_atob(a));
+        };
+        var _unURI = function(a) {
+          return _tidyB64(a.replace(/[-_]/g, function(m0) {
+            return m0 == "-" ? "+" : "/";
+          }));
+        };
+        var decode = function(src) {
+          return _decode(_unURI(src));
+        };
+        var isValid = function(src) {
+          if (typeof src !== "string")
+            return false;
+          var s = src.replace(/\s+/g, "").replace(/={0,2}$/, "");
+          return !/[^\s0-9a-zA-Z\+/]/.test(s) || !/[^\s0-9a-zA-Z\-_]/.test(s);
+        };
+        var _noEnum = function(v) {
+          return {
+            value: v,
+            enumerable: false,
+            writable: true,
+            configurable: true
+          };
+        };
+        var extendString = function() {
+          var _add = function(name, body) {
+            return Object.defineProperty(String.prototype, name, _noEnum(body));
+          };
+          _add("fromBase64", function() {
+            return decode(this);
+          });
+          _add("toBase64", function(urlsafe) {
+            return encode(this, urlsafe);
+          });
+          _add("toBase64URI", function() {
+            return encode(this, true);
+          });
+          _add("toBase64URL", function() {
+            return encode(this, true);
+          });
+          _add("toUint8Array", function() {
+            return toUint8Array(this);
+          });
+        };
+        var extendUint8Array = function() {
+          var _add = function(name, body) {
+            return Object.defineProperty(Uint8Array.prototype, name, _noEnum(body));
+          };
+          _add("toBase64", function(urlsafe) {
+            return fromUint8Array(this, urlsafe);
+          });
+          _add("toBase64URI", function() {
+            return fromUint8Array(this, true);
+          });
+          _add("toBase64URL", function() {
+            return fromUint8Array(this, true);
+          });
+        };
+        var extendBuiltins = function() {
+          extendString();
+          extendUint8Array();
+        };
+        var gBase64 = {
+          version,
+          VERSION,
+          atob: _atob,
+          atobPolyfill,
+          btoa: _btoa,
+          btoaPolyfill,
+          fromBase64: decode,
+          toBase64: encode,
+          encode,
+          encodeURI,
+          encodeURL: encodeURI,
+          utob,
+          btou,
+          decode,
+          isValid,
+          fromUint8Array,
+          toUint8Array,
+          extendString,
+          extendUint8Array,
+          extendBuiltins
+        };
+        gBase64.Base64 = {};
+        Object.keys(gBase64).forEach(function(k) {
+          return gBase64.Base64[k] = gBase64[k];
+        });
+        return gBase64;
+      });
     }
   });
 
@@ -831,46 +1075,24 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/universal-base64/dist/browser.js
-  var require_browser2 = __commonJS({
-    "node_modules/universal-base64/dist/browser.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      function percentToByte(p) {
-        return String.fromCharCode(parseInt(p.slice(1), 16));
-      }
-      function encode(str) {
-        return btoa(encodeURIComponent(str).replace(/%[0-9A-F]{2}/g, percentToByte));
-      }
-      exports.encode = encode;
-      function byteToPercent(b) {
-        return `%${`00${b.charCodeAt(0).toString(16)}`.slice(-2)}`;
-      }
-      function decode(str) {
-        return decodeURIComponent(Array.from(atob(str), byteToPercent).join(""));
-      }
-      exports.decode = decode;
-    }
-  });
-
   // node_modules/@eppo/js-client-sdk-common/dist/obfuscation.js
   var require_obfuscation = __commonJS({
     "node_modules/@eppo/js-client-sdk-common/dist/obfuscation.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.decodeBase64 = exports.encodeBase64 = exports.getMD5Hash = void 0;
+      var base64 = require_base64();
       var md5 = require_md5();
-      var universal_base64_1 = require_browser2();
       function getMD5Hash(input) {
         return md5(input);
       }
       exports.getMD5Hash = getMD5Hash;
       function encodeBase64(input) {
-        return (0, universal_base64_1.encode)(input);
+        return base64.btoaPolyfill(input);
       }
       exports.encodeBase64 = encodeBase64;
       function decodeBase64(input) {
-        return (0, universal_base64_1.decode)(input);
+        return base64.atobPolyfill(input);
       }
       exports.decodeBase64 = decodeBase64;
     }
@@ -917,6 +1139,30 @@ let eppoSdk = null;
         }
       };
       exports.LRUInMemoryAssignmentCache = LRUInMemoryAssignmentCache;
+    }
+  });
+
+  // node_modules/@eppo/js-client-sdk-common/dist/api-endpoints.js
+  var require_api_endpoints = __commonJS({
+    "node_modules/@eppo/js-client-sdk-common/dist/api-endpoints.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      var UFC_ENDPOINT = "/flag-config/v1/config";
+      var ApiEndpoints = class {
+        constructor(baseUrl, queryParams) {
+          this.baseUrl = baseUrl;
+          this.queryParams = queryParams;
+        }
+        endpoint(resource) {
+          const url = new URL(this.baseUrl + resource);
+          Object.entries(this.queryParams).forEach(([key, value]) => url.searchParams.append(key, value));
+          return url;
+        }
+        ufcEndpoint() {
+          return this.endpoint(UFC_ENDPOINT);
+        }
+      };
+      exports.default = ApiEndpoints;
     }
   });
 
@@ -1102,13 +1348,13 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/constants.js
+  // node_modules/semver/internal/constants.js
   var require_constants2 = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/constants.js"(exports, module) {
+    "node_modules/semver/internal/constants.js"(exports, module) {
       var SEMVER_SPEC_VERSION = "2.0.0";
       var MAX_LENGTH = 256;
       var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
-      9007199254740991;
+          9007199254740991;
       var MAX_SAFE_COMPONENT_LENGTH = 16;
       var MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6;
       var RELEASE_TYPES = [
@@ -1133,18 +1379,18 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/debug.js
+  // node_modules/semver/internal/debug.js
   var require_debug = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/debug.js"(exports, module) {
+    "node_modules/semver/internal/debug.js"(exports, module) {
       var debug = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
       };
       module.exports = debug;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/re.js
+  // node_modules/semver/internal/re.js
   var require_re = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/re.js"(exports, module) {
+    "node_modules/semver/internal/re.js"(exports, module) {
       var {
         MAX_SAFE_COMPONENT_LENGTH,
         MAX_SAFE_BUILD_LENGTH,
@@ -1200,11 +1446,8 @@ let eppoSdk = null;
       createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:${src[t.PRERELEASELOOSE]})?${src[t.BUILD]}?)?)?`);
       createToken("XRANGE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAIN]}$`);
       createToken("XRANGELOOSE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAINLOOSE]}$`);
-      createToken("COERCEPLAIN", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?`);
-      createToken("COERCE", `${src[t.COERCEPLAIN]}(?:$|[^\\d])`);
-      createToken("COERCEFULL", src[t.COERCEPLAIN] + `(?:${src[t.PRERELEASE]})?(?:${src[t.BUILD]})?(?:$|[^\\d])`);
+      createToken("COERCE", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:$|[^\\d])`);
       createToken("COERCERTL", src[t.COERCE], true);
-      createToken("COERCERTLFULL", src[t.COERCEFULL], true);
       createToken("LONETILDE", "(?:~>?)");
       createToken("TILDETRIM", `(\\s*)${src[t.LONETILDE]}\\s+`, true);
       exports.tildeTrimReplace = "$1~";
@@ -1227,9 +1470,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/parse-options.js
+  // node_modules/semver/internal/parse-options.js
   var require_parse_options = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/parse-options.js"(exports, module) {
+    "node_modules/semver/internal/parse-options.js"(exports, module) {
       var looseOption = Object.freeze({ loose: true });
       var emptyOpts = Object.freeze({});
       var parseOptions = (options) => {
@@ -1245,9 +1488,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/identifiers.js
+  // node_modules/semver/internal/identifiers.js
   var require_identifiers = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/identifiers.js"(exports, module) {
+    "node_modules/semver/internal/identifiers.js"(exports, module) {
       var numeric = /^[0-9]+$/;
       var compareIdentifiers = (a, b) => {
         const anum = numeric.test(a);
@@ -1266,9 +1509,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/semver.js
+  // node_modules/semver/classes/semver.js
   var require_semver = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/semver.js"(exports, module) {
+    "node_modules/semver/classes/semver.js"(exports, module) {
       var debug = require_debug();
       var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants2();
       var { safeRe: re, t } = require_re();
@@ -1288,7 +1531,7 @@ let eppoSdk = null;
           }
           if (version.length > MAX_LENGTH) {
             throw new TypeError(
-              `version is longer than ${MAX_LENGTH} characters`
+                `version is longer than ${MAX_LENGTH} characters`
             );
           }
           debug("SemVer", version, options);
@@ -1394,7 +1637,7 @@ let eppoSdk = null;
           do {
             const a = this.build[i];
             const b = other.build[i];
-            debug("build compare", i, a, b);
+            debug("prerelease compare", i, a, b);
             if (a === void 0 && b === void 0) {
               return 0;
             } else if (b === void 0) {
@@ -1508,9 +1751,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/parse.js
+  // node_modules/semver/functions/parse.js
   var require_parse = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/parse.js"(exports, module) {
+    "node_modules/semver/functions/parse.js"(exports, module) {
       var SemVer = require_semver();
       var parse = (version, options, throwErrors = false) => {
         if (version instanceof SemVer) {
@@ -1529,9 +1772,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/valid.js
+  // node_modules/semver/functions/valid.js
   var require_valid = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/valid.js"(exports, module) {
+    "node_modules/semver/functions/valid.js"(exports, module) {
       var parse = require_parse();
       var valid = (version, options) => {
         const v = parse(version, options);
@@ -1541,9 +1784,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/clean.js
+  // node_modules/semver/functions/clean.js
   var require_clean = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/clean.js"(exports, module) {
+    "node_modules/semver/functions/clean.js"(exports, module) {
       var parse = require_parse();
       var clean = (version, options) => {
         const s = parse(version.trim().replace(/^[=v]+/, ""), options);
@@ -1553,9 +1796,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/inc.js
+  // node_modules/semver/functions/inc.js
   var require_inc = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/inc.js"(exports, module) {
+    "node_modules/semver/functions/inc.js"(exports, module) {
       var SemVer = require_semver();
       var inc = (version, release, options, identifier, identifierBase) => {
         if (typeof options === "string") {
@@ -1565,8 +1808,8 @@ let eppoSdk = null;
         }
         try {
           return new SemVer(
-            version instanceof SemVer ? version.version : version,
-            options
+              version instanceof SemVer ? version.version : version,
+              options
           ).inc(release, identifier, identifierBase).version;
         } catch (er) {
           return null;
@@ -1576,9 +1819,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/diff.js
+  // node_modules/semver/functions/diff.js
   var require_diff = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/diff.js"(exports, module) {
+    "node_modules/semver/functions/diff.js"(exports, module) {
       var parse = require_parse();
       var diff = (version1, version2) => {
         const v1 = parse(version1, null, true);
@@ -1620,36 +1863,36 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/major.js
+  // node_modules/semver/functions/major.js
   var require_major = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/major.js"(exports, module) {
+    "node_modules/semver/functions/major.js"(exports, module) {
       var SemVer = require_semver();
       var major = (a, loose) => new SemVer(a, loose).major;
       module.exports = major;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/minor.js
+  // node_modules/semver/functions/minor.js
   var require_minor = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/minor.js"(exports, module) {
+    "node_modules/semver/functions/minor.js"(exports, module) {
       var SemVer = require_semver();
       var minor = (a, loose) => new SemVer(a, loose).minor;
       module.exports = minor;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/patch.js
+  // node_modules/semver/functions/patch.js
   var require_patch = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/patch.js"(exports, module) {
+    "node_modules/semver/functions/patch.js"(exports, module) {
       var SemVer = require_semver();
       var patch = (a, loose) => new SemVer(a, loose).patch;
       module.exports = patch;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/prerelease.js
+  // node_modules/semver/functions/prerelease.js
   var require_prerelease = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/prerelease.js"(exports, module) {
+    "node_modules/semver/functions/prerelease.js"(exports, module) {
       var parse = require_parse();
       var prerelease = (version, options) => {
         const parsed = parse(version, options);
@@ -1659,36 +1902,36 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare.js
+  // node_modules/semver/functions/compare.js
   var require_compare = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare.js"(exports, module) {
+    "node_modules/semver/functions/compare.js"(exports, module) {
       var SemVer = require_semver();
       var compare = (a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose));
       module.exports = compare;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/rcompare.js
+  // node_modules/semver/functions/rcompare.js
   var require_rcompare = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/rcompare.js"(exports, module) {
+    "node_modules/semver/functions/rcompare.js"(exports, module) {
       var compare = require_compare();
       var rcompare = (a, b, loose) => compare(b, a, loose);
       module.exports = rcompare;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare-loose.js
+  // node_modules/semver/functions/compare-loose.js
   var require_compare_loose = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare-loose.js"(exports, module) {
+    "node_modules/semver/functions/compare-loose.js"(exports, module) {
       var compare = require_compare();
       var compareLoose = (a, b) => compare(a, b, true);
       module.exports = compareLoose;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare-build.js
+  // node_modules/semver/functions/compare-build.js
   var require_compare_build = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/compare-build.js"(exports, module) {
+    "node_modules/semver/functions/compare-build.js"(exports, module) {
       var SemVer = require_semver();
       var compareBuild = (a, b, loose) => {
         const versionA = new SemVer(a, loose);
@@ -1699,81 +1942,81 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/sort.js
+  // node_modules/semver/functions/sort.js
   var require_sort = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/sort.js"(exports, module) {
+    "node_modules/semver/functions/sort.js"(exports, module) {
       var compareBuild = require_compare_build();
       var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
       module.exports = sort;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/rsort.js
+  // node_modules/semver/functions/rsort.js
   var require_rsort = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/rsort.js"(exports, module) {
+    "node_modules/semver/functions/rsort.js"(exports, module) {
       var compareBuild = require_compare_build();
       var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
       module.exports = rsort;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/gt.js
+  // node_modules/semver/functions/gt.js
   var require_gt = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/gt.js"(exports, module) {
+    "node_modules/semver/functions/gt.js"(exports, module) {
       var compare = require_compare();
       var gt = (a, b, loose) => compare(a, b, loose) > 0;
       module.exports = gt;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/lt.js
+  // node_modules/semver/functions/lt.js
   var require_lt = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/lt.js"(exports, module) {
+    "node_modules/semver/functions/lt.js"(exports, module) {
       var compare = require_compare();
       var lt = (a, b, loose) => compare(a, b, loose) < 0;
       module.exports = lt;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/eq.js
+  // node_modules/semver/functions/eq.js
   var require_eq = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/eq.js"(exports, module) {
+    "node_modules/semver/functions/eq.js"(exports, module) {
       var compare = require_compare();
       var eq = (a, b, loose) => compare(a, b, loose) === 0;
       module.exports = eq;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/neq.js
+  // node_modules/semver/functions/neq.js
   var require_neq = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/neq.js"(exports, module) {
+    "node_modules/semver/functions/neq.js"(exports, module) {
       var compare = require_compare();
       var neq = (a, b, loose) => compare(a, b, loose) !== 0;
       module.exports = neq;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/gte.js
+  // node_modules/semver/functions/gte.js
   var require_gte = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/gte.js"(exports, module) {
+    "node_modules/semver/functions/gte.js"(exports, module) {
       var compare = require_compare();
       var gte = (a, b, loose) => compare(a, b, loose) >= 0;
       module.exports = gte;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/lte.js
+  // node_modules/semver/functions/lte.js
   var require_lte = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/lte.js"(exports, module) {
+    "node_modules/semver/functions/lte.js"(exports, module) {
       var compare = require_compare();
       var lte = (a, b, loose) => compare(a, b, loose) <= 0;
       module.exports = lte;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/cmp.js
+  // node_modules/semver/functions/cmp.js
   var require_cmp = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/cmp.js"(exports, module) {
+    "node_modules/semver/functions/cmp.js"(exports, module) {
       var eq = require_eq();
       var neq = require_neq();
       var gt = require_gt();
@@ -1820,9 +2063,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/coerce.js
+  // node_modules/semver/functions/coerce.js
   var require_coerce = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/coerce.js"(exports, module) {
+    "node_modules/semver/functions/coerce.js"(exports, module) {
       var SemVer = require_semver();
       var parse = require_parse();
       var { safeRe: re, t } = require_re();
@@ -1839,72 +2082,681 @@ let eppoSdk = null;
         options = options || {};
         let match = null;
         if (!options.rtl) {
-          match = version.match(options.includePrerelease ? re[t.COERCEFULL] : re[t.COERCE]);
+          match = version.match(re[t.COERCE]);
         } else {
-          const coerceRtlRegex = options.includePrerelease ? re[t.COERCERTLFULL] : re[t.COERCERTL];
           let next;
-          while ((next = coerceRtlRegex.exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+          while ((next = re[t.COERCERTL].exec(version)) && (!match || match.index + match[0].length !== version.length)) {
             if (!match || next.index + next[0].length !== match.index + match[0].length) {
               match = next;
             }
-            coerceRtlRegex.lastIndex = next.index + next[1].length + next[2].length;
+            re[t.COERCERTL].lastIndex = next.index + next[1].length + next[2].length;
           }
-          coerceRtlRegex.lastIndex = -1;
+          re[t.COERCERTL].lastIndex = -1;
         }
         if (match === null) {
           return null;
         }
-        const major = match[2];
-        const minor = match[3] || "0";
-        const patch = match[4] || "0";
-        const prerelease = options.includePrerelease && match[5] ? `-${match[5]}` : "";
-        const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
-        return parse(`${major}.${minor}.${patch}${prerelease}${build}`, options);
+        return parse(`${match[2]}.${match[3] || "0"}.${match[4] || "0"}`, options);
       };
       module.exports = coerce;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/lrucache.js
-  var require_lrucache = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/internal/lrucache.js"(exports, module) {
+  // node_modules/yallist/iterator.js
+  var require_iterator = __commonJS({
+    "node_modules/yallist/iterator.js"(exports, module) {
+      "use strict";
+      module.exports = function(Yallist) {
+        Yallist.prototype[Symbol.iterator] = function* () {
+          for (let walker = this.head; walker; walker = walker.next) {
+            yield walker.value;
+          }
+        };
+      };
+    }
+  });
+
+  // node_modules/yallist/yallist.js
+  var require_yallist = __commonJS({
+    "node_modules/yallist/yallist.js"(exports, module) {
+      "use strict";
+      module.exports = Yallist;
+      Yallist.Node = Node;
+      Yallist.create = Yallist;
+      function Yallist(list) {
+        var self2 = this;
+        if (!(self2 instanceof Yallist)) {
+          self2 = new Yallist();
+        }
+        self2.tail = null;
+        self2.head = null;
+        self2.length = 0;
+        if (list && typeof list.forEach === "function") {
+          list.forEach(function(item) {
+            self2.push(item);
+          });
+        } else if (arguments.length > 0) {
+          for (var i = 0, l = arguments.length; i < l; i++) {
+            self2.push(arguments[i]);
+          }
+        }
+        return self2;
+      }
+      Yallist.prototype.removeNode = function(node) {
+        if (node.list !== this) {
+          throw new Error("removing node which does not belong to this list");
+        }
+        var next = node.next;
+        var prev = node.prev;
+        if (next) {
+          next.prev = prev;
+        }
+        if (prev) {
+          prev.next = next;
+        }
+        if (node === this.head) {
+          this.head = next;
+        }
+        if (node === this.tail) {
+          this.tail = prev;
+        }
+        node.list.length--;
+        node.next = null;
+        node.prev = null;
+        node.list = null;
+        return next;
+      };
+      Yallist.prototype.unshiftNode = function(node) {
+        if (node === this.head) {
+          return;
+        }
+        if (node.list) {
+          node.list.removeNode(node);
+        }
+        var head = this.head;
+        node.list = this;
+        node.next = head;
+        if (head) {
+          head.prev = node;
+        }
+        this.head = node;
+        if (!this.tail) {
+          this.tail = node;
+        }
+        this.length++;
+      };
+      Yallist.prototype.pushNode = function(node) {
+        if (node === this.tail) {
+          return;
+        }
+        if (node.list) {
+          node.list.removeNode(node);
+        }
+        var tail = this.tail;
+        node.list = this;
+        node.prev = tail;
+        if (tail) {
+          tail.next = node;
+        }
+        this.tail = node;
+        if (!this.head) {
+          this.head = node;
+        }
+        this.length++;
+      };
+      Yallist.prototype.push = function() {
+        for (var i = 0, l = arguments.length; i < l; i++) {
+          push(this, arguments[i]);
+        }
+        return this.length;
+      };
+      Yallist.prototype.unshift = function() {
+        for (var i = 0, l = arguments.length; i < l; i++) {
+          unshift(this, arguments[i]);
+        }
+        return this.length;
+      };
+      Yallist.prototype.pop = function() {
+        if (!this.tail) {
+          return void 0;
+        }
+        var res = this.tail.value;
+        this.tail = this.tail.prev;
+        if (this.tail) {
+          this.tail.next = null;
+        } else {
+          this.head = null;
+        }
+        this.length--;
+        return res;
+      };
+      Yallist.prototype.shift = function() {
+        if (!this.head) {
+          return void 0;
+        }
+        var res = this.head.value;
+        this.head = this.head.next;
+        if (this.head) {
+          this.head.prev = null;
+        } else {
+          this.tail = null;
+        }
+        this.length--;
+        return res;
+      };
+      Yallist.prototype.forEach = function(fn, thisp) {
+        thisp = thisp || this;
+        for (var walker = this.head, i = 0; walker !== null; i++) {
+          fn.call(thisp, walker.value, i, this);
+          walker = walker.next;
+        }
+      };
+      Yallist.prototype.forEachReverse = function(fn, thisp) {
+        thisp = thisp || this;
+        for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
+          fn.call(thisp, walker.value, i, this);
+          walker = walker.prev;
+        }
+      };
+      Yallist.prototype.get = function(n) {
+        for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
+          walker = walker.next;
+        }
+        if (i === n && walker !== null) {
+          return walker.value;
+        }
+      };
+      Yallist.prototype.getReverse = function(n) {
+        for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
+          walker = walker.prev;
+        }
+        if (i === n && walker !== null) {
+          return walker.value;
+        }
+      };
+      Yallist.prototype.map = function(fn, thisp) {
+        thisp = thisp || this;
+        var res = new Yallist();
+        for (var walker = this.head; walker !== null; ) {
+          res.push(fn.call(thisp, walker.value, this));
+          walker = walker.next;
+        }
+        return res;
+      };
+      Yallist.prototype.mapReverse = function(fn, thisp) {
+        thisp = thisp || this;
+        var res = new Yallist();
+        for (var walker = this.tail; walker !== null; ) {
+          res.push(fn.call(thisp, walker.value, this));
+          walker = walker.prev;
+        }
+        return res;
+      };
+      Yallist.prototype.reduce = function(fn, initial) {
+        var acc;
+        var walker = this.head;
+        if (arguments.length > 1) {
+          acc = initial;
+        } else if (this.head) {
+          walker = this.head.next;
+          acc = this.head.value;
+        } else {
+          throw new TypeError("Reduce of empty list with no initial value");
+        }
+        for (var i = 0; walker !== null; i++) {
+          acc = fn(acc, walker.value, i);
+          walker = walker.next;
+        }
+        return acc;
+      };
+      Yallist.prototype.reduceReverse = function(fn, initial) {
+        var acc;
+        var walker = this.tail;
+        if (arguments.length > 1) {
+          acc = initial;
+        } else if (this.tail) {
+          walker = this.tail.prev;
+          acc = this.tail.value;
+        } else {
+          throw new TypeError("Reduce of empty list with no initial value");
+        }
+        for (var i = this.length - 1; walker !== null; i--) {
+          acc = fn(acc, walker.value, i);
+          walker = walker.prev;
+        }
+        return acc;
+      };
+      Yallist.prototype.toArray = function() {
+        var arr = new Array(this.length);
+        for (var i = 0, walker = this.head; walker !== null; i++) {
+          arr[i] = walker.value;
+          walker = walker.next;
+        }
+        return arr;
+      };
+      Yallist.prototype.toArrayReverse = function() {
+        var arr = new Array(this.length);
+        for (var i = 0, walker = this.tail; walker !== null; i++) {
+          arr[i] = walker.value;
+          walker = walker.prev;
+        }
+        return arr;
+      };
+      Yallist.prototype.slice = function(from, to) {
+        to = to || this.length;
+        if (to < 0) {
+          to += this.length;
+        }
+        from = from || 0;
+        if (from < 0) {
+          from += this.length;
+        }
+        var ret = new Yallist();
+        if (to < from || to < 0) {
+          return ret;
+        }
+        if (from < 0) {
+          from = 0;
+        }
+        if (to > this.length) {
+          to = this.length;
+        }
+        for (var i = 0, walker = this.head; walker !== null && i < from; i++) {
+          walker = walker.next;
+        }
+        for (; walker !== null && i < to; i++, walker = walker.next) {
+          ret.push(walker.value);
+        }
+        return ret;
+      };
+      Yallist.prototype.sliceReverse = function(from, to) {
+        to = to || this.length;
+        if (to < 0) {
+          to += this.length;
+        }
+        from = from || 0;
+        if (from < 0) {
+          from += this.length;
+        }
+        var ret = new Yallist();
+        if (to < from || to < 0) {
+          return ret;
+        }
+        if (from < 0) {
+          from = 0;
+        }
+        if (to > this.length) {
+          to = this.length;
+        }
+        for (var i = this.length, walker = this.tail; walker !== null && i > to; i--) {
+          walker = walker.prev;
+        }
+        for (; walker !== null && i > from; i--, walker = walker.prev) {
+          ret.push(walker.value);
+        }
+        return ret;
+      };
+      Yallist.prototype.splice = function(start, deleteCount, ...nodes) {
+        if (start > this.length) {
+          start = this.length - 1;
+        }
+        if (start < 0) {
+          start = this.length + start;
+        }
+        for (var i = 0, walker = this.head; walker !== null && i < start; i++) {
+          walker = walker.next;
+        }
+        var ret = [];
+        for (var i = 0; walker && i < deleteCount; i++) {
+          ret.push(walker.value);
+          walker = this.removeNode(walker);
+        }
+        if (walker === null) {
+          walker = this.tail;
+        }
+        if (walker !== this.head && walker !== this.tail) {
+          walker = walker.prev;
+        }
+        for (var i = 0; i < nodes.length; i++) {
+          walker = insert(this, walker, nodes[i]);
+        }
+        return ret;
+      };
+      Yallist.prototype.reverse = function() {
+        var head = this.head;
+        var tail = this.tail;
+        for (var walker = head; walker !== null; walker = walker.prev) {
+          var p = walker.prev;
+          walker.prev = walker.next;
+          walker.next = p;
+        }
+        this.head = tail;
+        this.tail = head;
+        return this;
+      };
+      function insert(self2, node, value) {
+        var inserted = node === self2.head ? new Node(value, null, node, self2) : new Node(value, node, node.next, self2);
+        if (inserted.next === null) {
+          self2.tail = inserted;
+        }
+        if (inserted.prev === null) {
+          self2.head = inserted;
+        }
+        self2.length++;
+        return inserted;
+      }
+      function push(self2, item) {
+        self2.tail = new Node(item, self2.tail, null, self2);
+        if (!self2.head) {
+          self2.head = self2.tail;
+        }
+        self2.length++;
+      }
+      function unshift(self2, item) {
+        self2.head = new Node(item, null, self2.head, self2);
+        if (!self2.tail) {
+          self2.tail = self2.head;
+        }
+        self2.length++;
+      }
+      function Node(value, prev, next, list) {
+        if (!(this instanceof Node)) {
+          return new Node(value, prev, next, list);
+        }
+        this.list = list;
+        this.value = value;
+        if (prev) {
+          prev.next = this;
+          this.prev = prev;
+        } else {
+          this.prev = null;
+        }
+        if (next) {
+          next.prev = this;
+          this.next = next;
+        } else {
+          this.next = null;
+        }
+      }
+      try {
+        require_iterator()(Yallist);
+      } catch (er) {
+      }
+    }
+  });
+
+  // node_modules/semver/node_modules/lru-cache/index.js
+  var require_lru_cache2 = __commonJS({
+    "node_modules/semver/node_modules/lru-cache/index.js"(exports, module) {
+      "use strict";
+      var Yallist = require_yallist();
+      var MAX = Symbol("max");
+      var LENGTH = Symbol("length");
+      var LENGTH_CALCULATOR = Symbol("lengthCalculator");
+      var ALLOW_STALE = Symbol("allowStale");
+      var MAX_AGE = Symbol("maxAge");
+      var DISPOSE = Symbol("dispose");
+      var NO_DISPOSE_ON_SET = Symbol("noDisposeOnSet");
+      var LRU_LIST = Symbol("lruList");
+      var CACHE = Symbol("cache");
+      var UPDATE_AGE_ON_GET = Symbol("updateAgeOnGet");
+      var naiveLength = () => 1;
       var LRUCache = class {
-        constructor() {
-          this.max = 1e3;
-          this.map = /* @__PURE__ */ new Map();
+        constructor(options) {
+          if (typeof options === "number")
+            options = { max: options };
+          if (!options)
+            options = {};
+          if (options.max && (typeof options.max !== "number" || options.max < 0))
+            throw new TypeError("max must be a non-negative number");
+          const max = this[MAX] = options.max || Infinity;
+          const lc = options.length || naiveLength;
+          this[LENGTH_CALCULATOR] = typeof lc !== "function" ? naiveLength : lc;
+          this[ALLOW_STALE] = options.stale || false;
+          if (options.maxAge && typeof options.maxAge !== "number")
+            throw new TypeError("maxAge must be a number");
+          this[MAX_AGE] = options.maxAge || 0;
+          this[DISPOSE] = options.dispose;
+          this[NO_DISPOSE_ON_SET] = options.noDisposeOnSet || false;
+          this[UPDATE_AGE_ON_GET] = options.updateAgeOnGet || false;
+          this.reset();
+        }
+        // resize the cache when the max changes.
+        set max(mL) {
+          if (typeof mL !== "number" || mL < 0)
+            throw new TypeError("max must be a non-negative number");
+          this[MAX] = mL || Infinity;
+          trim(this);
+        }
+        get max() {
+          return this[MAX];
+        }
+        set allowStale(allowStale) {
+          this[ALLOW_STALE] = !!allowStale;
+        }
+        get allowStale() {
+          return this[ALLOW_STALE];
+        }
+        set maxAge(mA) {
+          if (typeof mA !== "number")
+            throw new TypeError("maxAge must be a non-negative number");
+          this[MAX_AGE] = mA;
+          trim(this);
+        }
+        get maxAge() {
+          return this[MAX_AGE];
+        }
+        // resize the cache when the lengthCalculator changes.
+        set lengthCalculator(lC) {
+          if (typeof lC !== "function")
+            lC = naiveLength;
+          if (lC !== this[LENGTH_CALCULATOR]) {
+            this[LENGTH_CALCULATOR] = lC;
+            this[LENGTH] = 0;
+            this[LRU_LIST].forEach((hit) => {
+              hit.length = this[LENGTH_CALCULATOR](hit.value, hit.key);
+              this[LENGTH] += hit.length;
+            });
+          }
+          trim(this);
+        }
+        get lengthCalculator() {
+          return this[LENGTH_CALCULATOR];
+        }
+        get length() {
+          return this[LENGTH];
+        }
+        get itemCount() {
+          return this[LRU_LIST].length;
+        }
+        rforEach(fn, thisp) {
+          thisp = thisp || this;
+          for (let walker = this[LRU_LIST].tail; walker !== null; ) {
+            const prev = walker.prev;
+            forEachStep(this, fn, walker, thisp);
+            walker = prev;
+          }
+        }
+        forEach(fn, thisp) {
+          thisp = thisp || this;
+          for (let walker = this[LRU_LIST].head; walker !== null; ) {
+            const next = walker.next;
+            forEachStep(this, fn, walker, thisp);
+            walker = next;
+          }
+        }
+        keys() {
+          return this[LRU_LIST].toArray().map((k) => k.key);
+        }
+        values() {
+          return this[LRU_LIST].toArray().map((k) => k.value);
+        }
+        reset() {
+          if (this[DISPOSE] && this[LRU_LIST] && this[LRU_LIST].length) {
+            this[LRU_LIST].forEach((hit) => this[DISPOSE](hit.key, hit.value));
+          }
+          this[CACHE] = /* @__PURE__ */ new Map();
+          this[LRU_LIST] = new Yallist();
+          this[LENGTH] = 0;
+        }
+        dump() {
+          return this[LRU_LIST].map((hit) => isStale(this, hit) ? false : {
+            k: hit.key,
+            v: hit.value,
+            e: hit.now + (hit.maxAge || 0)
+          }).toArray().filter((h) => h);
+        }
+        dumpLru() {
+          return this[LRU_LIST];
+        }
+        set(key, value, maxAge) {
+          maxAge = maxAge || this[MAX_AGE];
+          if (maxAge && typeof maxAge !== "number")
+            throw new TypeError("maxAge must be a number");
+          const now = maxAge ? Date.now() : 0;
+          const len = this[LENGTH_CALCULATOR](value, key);
+          if (this[CACHE].has(key)) {
+            if (len > this[MAX]) {
+              del(this, this[CACHE].get(key));
+              return false;
+            }
+            const node = this[CACHE].get(key);
+            const item = node.value;
+            if (this[DISPOSE]) {
+              if (!this[NO_DISPOSE_ON_SET])
+                this[DISPOSE](key, item.value);
+            }
+            item.now = now;
+            item.maxAge = maxAge;
+            item.value = value;
+            this[LENGTH] += len - item.length;
+            item.length = len;
+            this.get(key);
+            trim(this);
+            return true;
+          }
+          const hit = new Entry(key, value, len, now, maxAge);
+          if (hit.length > this[MAX]) {
+            if (this[DISPOSE])
+              this[DISPOSE](key, value);
+            return false;
+          }
+          this[LENGTH] += hit.length;
+          this[LRU_LIST].unshift(hit);
+          this[CACHE].set(key, this[LRU_LIST].head);
+          trim(this);
+          return true;
+        }
+        has(key) {
+          if (!this[CACHE].has(key)) return false;
+          const hit = this[CACHE].get(key).value;
+          return !isStale(this, hit);
         }
         get(key) {
-          const value = this.map.get(key);
-          if (value === void 0) {
-            return void 0;
-          } else {
-            this.map.delete(key);
-            this.map.set(key, value);
-            return value;
-          }
+          return get(this, key, true);
         }
-        delete(key) {
-          return this.map.delete(key);
+        peek(key) {
+          return get(this, key, false);
         }
-        set(key, value) {
-          const deleted = this.delete(key);
-          if (!deleted && value !== void 0) {
-            if (this.map.size >= this.max) {
-              const firstKey = this.map.keys().next().value;
-              this.delete(firstKey);
+        pop() {
+          const node = this[LRU_LIST].tail;
+          if (!node)
+            return null;
+          del(this, node);
+          return node.value;
+        }
+        del(key) {
+          del(this, this[CACHE].get(key));
+        }
+        load(arr) {
+          this.reset();
+          const now = Date.now();
+          for (let l = arr.length - 1; l >= 0; l--) {
+            const hit = arr[l];
+            const expiresAt = hit.e || 0;
+            if (expiresAt === 0)
+              this.set(hit.k, hit.v);
+            else {
+              const maxAge = expiresAt - now;
+              if (maxAge > 0) {
+                this.set(hit.k, hit.v, maxAge);
+              }
             }
-            this.map.set(key, value);
           }
-          return this;
         }
+        prune() {
+          this[CACHE].forEach((value, key) => get(this, key, false));
+        }
+      };
+      var get = (self2, key, doUse) => {
+        const node = self2[CACHE].get(key);
+        if (node) {
+          const hit = node.value;
+          if (isStale(self2, hit)) {
+            del(self2, node);
+            if (!self2[ALLOW_STALE])
+              return void 0;
+          } else {
+            if (doUse) {
+              if (self2[UPDATE_AGE_ON_GET])
+                node.value.now = Date.now();
+              self2[LRU_LIST].unshiftNode(node);
+            }
+          }
+          return hit.value;
+        }
+      };
+      var isStale = (self2, hit) => {
+        if (!hit || !hit.maxAge && !self2[MAX_AGE])
+          return false;
+        const diff = Date.now() - hit.now;
+        return hit.maxAge ? diff > hit.maxAge : self2[MAX_AGE] && diff > self2[MAX_AGE];
+      };
+      var trim = (self2) => {
+        if (self2[LENGTH] > self2[MAX]) {
+          for (let walker = self2[LRU_LIST].tail; self2[LENGTH] > self2[MAX] && walker !== null; ) {
+            const prev = walker.prev;
+            del(self2, walker);
+            walker = prev;
+          }
+        }
+      };
+      var del = (self2, node) => {
+        if (node) {
+          const hit = node.value;
+          if (self2[DISPOSE])
+            self2[DISPOSE](hit.key, hit.value);
+          self2[LENGTH] -= hit.length;
+          self2[CACHE].delete(hit.key);
+          self2[LRU_LIST].removeNode(node);
+        }
+      };
+      var Entry = class {
+        constructor(key, value, length, now, maxAge) {
+          this.key = key;
+          this.value = value;
+          this.length = length;
+          this.now = now;
+          this.maxAge = maxAge || 0;
+        }
+      };
+      var forEachStep = (self2, fn, node, thisp) => {
+        let hit = node.value;
+        if (isStale(self2, hit)) {
+          del(self2, node);
+          if (!self2[ALLOW_STALE])
+            hit = void 0;
+        }
+        if (hit)
+          fn.call(thisp, hit.value, hit.key, self2);
       };
       module.exports = LRUCache;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/range.js
+  // node_modules/semver/classes/range.js
   var require_range = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/range.js"(exports, module) {
+    "node_modules/semver/classes/range.js"(exports, module) {
       var Range = class _Range {
         constructor(range, options) {
           options = parseOptions(options);
@@ -2027,8 +2879,8 @@ let eppoSdk = null;
         }
       };
       module.exports = Range;
-      var LRU = require_lrucache();
-      var cache = new LRU();
+      var LRU = require_lru_cache2();
+      var cache = new LRU({ max: 1e3 });
       var parseOptions = require_parse_options();
       var Comparator = require_comparator();
       var debug = require_debug();
@@ -2206,7 +3058,7 @@ let eppoSdk = null;
         debug("replaceGTE0", comp, options);
         return comp.trim().replace(re[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
       };
-      var hyphenReplace = (incPr) => ($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr) => {
+      var hyphenReplace = (incPr) => ($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) => {
         if (isX(fM)) {
           from = "";
         } else if (isX(fm)) {
@@ -2259,9 +3111,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/comparator.js
+  // node_modules/semver/classes/comparator.js
   var require_comparator = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/classes/comparator.js"(exports, module) {
+    "node_modules/semver/classes/comparator.js"(exports, module) {
       var ANY = Symbol("SemVer ANY");
       var Comparator = class _Comparator {
         static get ANY() {
@@ -2371,9 +3223,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/satisfies.js
+  // node_modules/semver/functions/satisfies.js
   var require_satisfies = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/functions/satisfies.js"(exports, module) {
+    "node_modules/semver/functions/satisfies.js"(exports, module) {
       var Range = require_range();
       var satisfies = (version, range, options) => {
         try {
@@ -2387,18 +3239,18 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/to-comparators.js
+  // node_modules/semver/ranges/to-comparators.js
   var require_to_comparators = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/to-comparators.js"(exports, module) {
+    "node_modules/semver/ranges/to-comparators.js"(exports, module) {
       var Range = require_range();
       var toComparators = (range, options) => new Range(range, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
       module.exports = toComparators;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/max-satisfying.js
+  // node_modules/semver/ranges/max-satisfying.js
   var require_max_satisfying = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/max-satisfying.js"(exports, module) {
+    "node_modules/semver/ranges/max-satisfying.js"(exports, module) {
       var SemVer = require_semver();
       var Range = require_range();
       var maxSatisfying = (versions, range, options) => {
@@ -2424,9 +3276,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/min-satisfying.js
+  // node_modules/semver/ranges/min-satisfying.js
   var require_min_satisfying = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/min-satisfying.js"(exports, module) {
+    "node_modules/semver/ranges/min-satisfying.js"(exports, module) {
       var SemVer = require_semver();
       var Range = require_range();
       var minSatisfying = (versions, range, options) => {
@@ -2452,9 +3304,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/min-version.js
+  // node_modules/semver/ranges/min-version.js
   var require_min_version = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/min-version.js"(exports, module) {
+    "node_modules/semver/ranges/min-version.js"(exports, module) {
       var SemVer = require_semver();
       var Range = require_range();
       var gt = require_gt();
@@ -2508,9 +3360,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/valid.js
+  // node_modules/semver/ranges/valid.js
   var require_valid2 = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/valid.js"(exports, module) {
+    "node_modules/semver/ranges/valid.js"(exports, module) {
       var Range = require_range();
       var validRange = (range, options) => {
         try {
@@ -2523,9 +3375,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/outside.js
+  // node_modules/semver/ranges/outside.js
   var require_outside = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/outside.js"(exports, module) {
+    "node_modules/semver/ranges/outside.js"(exports, module) {
       var SemVer = require_semver();
       var Comparator = require_comparator();
       var { ANY } = Comparator;
@@ -2591,27 +3443,27 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/gtr.js
+  // node_modules/semver/ranges/gtr.js
   var require_gtr = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/gtr.js"(exports, module) {
+    "node_modules/semver/ranges/gtr.js"(exports, module) {
       var outside = require_outside();
       var gtr = (version, range, options) => outside(version, range, ">", options);
       module.exports = gtr;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/ltr.js
+  // node_modules/semver/ranges/ltr.js
   var require_ltr = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/ltr.js"(exports, module) {
+    "node_modules/semver/ranges/ltr.js"(exports, module) {
       var outside = require_outside();
       var ltr = (version, range, options) => outside(version, range, "<", options);
       module.exports = ltr;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/intersects.js
+  // node_modules/semver/ranges/intersects.js
   var require_intersects = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/intersects.js"(exports, module) {
+    "node_modules/semver/ranges/intersects.js"(exports, module) {
       var Range = require_range();
       var intersects = (r1, r2, options) => {
         r1 = new Range(r1, options);
@@ -2622,9 +3474,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/simplify.js
+  // node_modules/semver/ranges/simplify.js
   var require_simplify = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/simplify.js"(exports, module) {
+    "node_modules/semver/ranges/simplify.js"(exports, module) {
       var satisfies = require_satisfies();
       var compare = require_compare();
       module.exports = (versions, range, options) => {
@@ -2671,9 +3523,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/subset.js
+  // node_modules/semver/ranges/subset.js
   var require_subset = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/ranges/subset.js"(exports, module) {
+    "node_modules/semver/ranges/subset.js"(exports, module) {
       var Range = require_range();
       var Comparator = require_comparator();
       var { ANY } = Comparator;
@@ -2832,9 +3684,9 @@ let eppoSdk = null;
     }
   });
 
-  // node_modules/@eppo/js-client-sdk-common/node_modules/semver/index.js
+  // node_modules/semver/index.js
   var require_semver2 = __commonJS({
-    "node_modules/@eppo/js-client-sdk-common/node_modules/semver/index.js"(exports, module) {
+    "node_modules/semver/index.js"(exports, module) {
       var internalRe = require_re();
       var constants = require_constants2();
       var SemVer = require_semver();
@@ -3204,14 +4056,13 @@ let eppoSdk = null;
     "node_modules/@eppo/js-client-sdk-common/dist/flag-configuration-requestor.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
-      var UFC_ENDPOINT = "/flag-config/v1/config";
       var FlagConfigurationRequestor = class {
         constructor(configurationStore, httpClient) {
           this.configurationStore = configurationStore;
           this.httpClient = httpClient;
         }
         async fetchAndStoreConfigurations() {
-          const responseData = await this.httpClient.get(UFC_ENDPOINT);
+          const responseData = await this.httpClient.getUniversalFlagConfiguration();
           if (!responseData) {
             return {};
           }
@@ -3242,14 +4093,15 @@ let eppoSdk = null;
       };
       exports.HttpRequestError = HttpRequestError;
       var FetchHttpClient = class {
-        constructor(baseUrl, sdkParams, timeout) {
-          this.baseUrl = baseUrl;
-          this.sdkParams = sdkParams;
+        constructor(apiEndpoints, timeout) {
+          this.apiEndpoints = apiEndpoints;
           this.timeout = timeout;
         }
-        async get(resource) {
-          const url = new URL(this.baseUrl + resource);
-          Object.entries(this.sdkParams).forEach(([key, value]) => url.searchParams.append(key, value));
+        async getUniversalFlagConfiguration() {
+          const url = this.apiEndpoints.ufcEndpoint();
+          return await this.rawGet(url);
+        }
+        async rawGet(url) {
           try {
             const controller = new AbortController();
             const signal = controller.signal;
@@ -3259,7 +4111,7 @@ let eppoSdk = null;
             if (!response.ok) {
               throw new HttpRequestError("Failed to fetch data", response.status);
             }
-            return response.json();
+            return await response.json();
           } catch (error) {
             if (error.name === "AbortError") {
               throw new HttpRequestError("Request timed out", 408, error);
@@ -3406,11 +4258,13 @@ let eppoSdk = null;
     "node_modules/@eppo/js-client-sdk-common/package.json"(exports, module) {
       module.exports = {
         name: "@eppo/js-client-sdk-common",
-        version: "3.1.0",
+        version: "3.2.2",
         description: "Eppo SDK for client-side JavaScript applications (base for both web and react native)",
         main: "dist/index.js",
         files: [
-          "/dist"
+          "/dist",
+          "/src",
+          "!*.spec.ts"
         ],
         types: "./dist/index.d.ts",
         engines: {
@@ -3446,6 +4300,7 @@ let eppoSdk = null;
         homepage: "https://github.com/Eppo-exp/js-client-sdk-common#readme",
         devDependencies: {
           "@types/jest": "^29.5.11",
+          "@types/js-base64": "^3.3.1",
           "@types/md5": "^2.3.2",
           "@types/semver": "^7.5.6",
           "@typescript-eslint/eslint-plugin": "^5.13.0",
@@ -3469,10 +4324,10 @@ let eppoSdk = null;
           "webpack-cli": "^4.10.0"
         },
         dependencies: {
+          "js-base64": "^3.7.7",
           md5: "^2.3.0",
           pino: "^8.19.0",
-          semver: "^7.5.4",
-          "universal-base64": "^2.1.0"
+          semver: "^7.5.4"
         }
       };
     }
@@ -3495,6 +4350,7 @@ let eppoSdk = null;
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.checkValueTypeMatch = exports.checkTypeMatch = void 0;
+      var api_endpoints_1 = require_api_endpoints();
       var application_logger_1 = require_application_logger();
       var assignment_cache_1 = require_assignment_cache();
       var constants_1 = require_constants();
@@ -3509,14 +4365,13 @@ let eppoSdk = null;
       var validation_1 = require_validation();
       var version_1 = require_version();
       var EppoClient = class {
-        constructor(configurationStore, configurationRequestParameters, obfuscated = false) {
+        constructor(configurationStore, configurationRequestParameters, isObfuscated = false) {
+          this.isObfuscated = isObfuscated;
           this.queuedEvents = [];
           this.isGracefulFailureMode = true;
-          this.isObfuscated = false;
           this.evaluator = new evaluator_1.Evaluator();
           this.configurationStore = configurationStore;
           this.configurationRequestParameters = configurationRequestParameters;
-          this.isObfuscated = obfuscated;
         }
         setConfigurationRequestParameters(configurationRequestParameters) {
           this.configurationRequestParameters = configurationRequestParameters;
@@ -3525,7 +4380,6 @@ let eppoSdk = null;
           this.configurationStore = configurationStore;
         }
         async fetchFlagConfigurations() {
-          var _a, _b, _c, _d, _e, _f;
           if (!this.configurationRequestParameters) {
             throw new Error("Eppo SDK unable to fetch flag configurations without configuration request parameters");
           }
@@ -3537,19 +4391,17 @@ let eppoSdk = null;
             application_logger_1.logger.info("[Eppo SDK] Configuration store is not expired. Skipping fetching flag configurations");
             return;
           }
-          const httpClient = new http_client_1.default(this.configurationRequestParameters.baseUrl || constants_1.BASE_URL, {
-            apiKey: this.configurationRequestParameters.apiKey,
-            sdkName: this.configurationRequestParameters.sdkName,
-            sdkVersion: this.configurationRequestParameters.sdkVersion
-          }, this.configurationRequestParameters.requestTimeoutMs || constants_1.DEFAULT_REQUEST_TIMEOUT_MS);
+          const { apiKey, sdkName, sdkVersion, baseUrl = constants_1.BASE_URL, requestTimeoutMs = constants_1.DEFAULT_REQUEST_TIMEOUT_MS, numInitialRequestRetries = constants_1.DEFAULT_INITIAL_CONFIG_REQUEST_RETRIES, numPollRequestRetries = constants_1.DEFAULT_POLL_CONFIG_REQUEST_RETRIES, pollAfterSuccessfulInitialization = false, pollAfterFailedInitialization = false, throwOnFailedInitialization = false, skipInitialPoll = false } = this.configurationRequestParameters;
+          const apiEndpoints = new api_endpoints_1.default(baseUrl, { apiKey, sdkName, sdkVersion });
+          const httpClient = new http_client_1.default(apiEndpoints, requestTimeoutMs);
           const configurationRequestor = new flag_configuration_requestor_1.default(this.configurationStore, httpClient);
           this.requestPoller = (0, poller_1.default)(constants_1.POLL_INTERVAL_MS, configurationRequestor.fetchAndStoreConfigurations.bind(configurationRequestor), {
-            maxStartRetries: (_a = this.configurationRequestParameters.numInitialRequestRetries) !== null && _a !== void 0 ? _a : constants_1.DEFAULT_INITIAL_CONFIG_REQUEST_RETRIES,
-            maxPollRetries: (_b = this.configurationRequestParameters.numPollRequestRetries) !== null && _b !== void 0 ? _b : constants_1.DEFAULT_POLL_CONFIG_REQUEST_RETRIES,
-            pollAfterSuccessfulStart: (_c = this.configurationRequestParameters.pollAfterSuccessfulInitialization) !== null && _c !== void 0 ? _c : false,
-            pollAfterFailedStart: (_d = this.configurationRequestParameters.pollAfterFailedInitialization) !== null && _d !== void 0 ? _d : false,
-            errorOnFailedStart: (_e = this.configurationRequestParameters.throwOnFailedInitialization) !== null && _e !== void 0 ? _e : false,
-            skipInitialPoll: (_f = this.configurationRequestParameters.skipInitialPoll) !== null && _f !== void 0 ? _f : false
+            maxStartRetries: numInitialRequestRetries,
+            maxPollRetries: numPollRequestRetries,
+            pollAfterSuccessfulStart: pollAfterSuccessfulInitialization,
+            pollAfterFailedStart: pollAfterFailedInitialization,
+            errorOnFailedStart: throwOnFailedInitialization,
+            skipInitialPoll
           });
           await this.requestPoller.start();
         }
@@ -3605,11 +4457,10 @@ let eppoSdk = null;
          * Note: This method is experimental and may change in future versions.
          * Please only use for debugging purposes, and not in production.
          *
-         * @param subjectKey The subject key
          * @param flagKey The flag key
+         * @param subjectKey The subject key
          * @param subjectAttributes The subject attributes
          * @param expectedVariationType The expected variation type
-         * @param obfuscated Whether the flag key is obfuscated
          * @returns A detailed return of assignment for a particular subject and flag
          */
         getAssignmentDetail(flagKey, subjectKey, subjectAttributes = {}, expectedVariationType) {
@@ -3696,10 +4547,10 @@ let eppoSdk = null;
         logAssignment(result) {
           var _a, _b, _c, _d, _e, _f, _g, _h, _j;
           const event = Object.assign(Object.assign({}, (_a = result.extraLogging) !== null && _a !== void 0 ? _a : {}), { allocation: (_b = result.allocationKey) !== null && _b !== void 0 ? _b : null, experiment: result.allocationKey ? `${result.flagKey}-${result.allocationKey}` : null, featureFlag: result.flagKey, variation: (_d = (_c = result.variation) === null || _c === void 0 ? void 0 : _c.key) !== null && _d !== void 0 ? _d : null, subject: result.subjectKey, timestamp: (/* @__PURE__ */ new Date()).toISOString(), subjectAttributes: result.subjectAttributes, metaData: {
-            obfuscated: this.isObfuscated,
-            sdkLanguage: "javascript",
-            sdkLibVersion: version_1.LIB_VERSION
-          } });
+              obfuscated: this.isObfuscated,
+              sdkLanguage: "javascript",
+              sdkLibVersion: version_1.LIB_VERSION
+            } });
           if (result.variation && result.allocationKey && ((_e = this.assignmentCache) === null || _e === void 0 ? void 0 : _e.hasLoggedAssignment({
             flagKey: result.flagKey,
             subjectKey: result.subjectKey,
@@ -3873,31 +4724,31 @@ let eppoSdk = null;
       exports.VariationType = exports.LRUInMemoryAssignmentCache = exports.NonExpiringInMemoryAssignmentCache = exports.AssignmentCache = exports.MemoryOnlyConfigurationStore = exports.HybridConfigurationStore = exports.MemoryStore = exports.validation = exports.HttpClient = exports.FlagConfigRequestor = exports.constants = exports.EppoClient = exports.applicationLogger = void 0;
       var application_logger_1 = require_application_logger();
       Object.defineProperty(exports, "applicationLogger", { enumerable: true, get: function() {
-        return application_logger_1.logger;
-      } });
+          return application_logger_1.logger;
+        } });
       var assignment_cache_1 = require_assignment_cache();
       Object.defineProperty(exports, "AssignmentCache", { enumerable: true, get: function() {
-        return assignment_cache_1.AssignmentCache;
-      } });
+          return assignment_cache_1.AssignmentCache;
+        } });
       Object.defineProperty(exports, "NonExpiringInMemoryAssignmentCache", { enumerable: true, get: function() {
-        return assignment_cache_1.NonExpiringInMemoryAssignmentCache;
-      } });
+          return assignment_cache_1.NonExpiringInMemoryAssignmentCache;
+        } });
       Object.defineProperty(exports, "LRUInMemoryAssignmentCache", { enumerable: true, get: function() {
-        return assignment_cache_1.LRUInMemoryAssignmentCache;
-      } });
+          return assignment_cache_1.LRUInMemoryAssignmentCache;
+        } });
       var eppo_client_1 = require_eppo_client();
       exports.EppoClient = eppo_client_1.default;
       var hybrid_store_1 = require_hybrid_store();
       Object.defineProperty(exports, "HybridConfigurationStore", { enumerable: true, get: function() {
-        return hybrid_store_1.HybridConfigurationStore;
-      } });
+          return hybrid_store_1.HybridConfigurationStore;
+        } });
       var memory_store_1 = require_memory_store();
       Object.defineProperty(exports, "MemoryStore", { enumerable: true, get: function() {
-        return memory_store_1.MemoryStore;
-      } });
+          return memory_store_1.MemoryStore;
+        } });
       Object.defineProperty(exports, "MemoryOnlyConfigurationStore", { enumerable: true, get: function() {
-        return memory_store_1.MemoryOnlyConfigurationStore;
-      } });
+          return memory_store_1.MemoryOnlyConfigurationStore;
+        } });
       var constants = require_constants();
       exports.constants = constants;
       var flag_configuration_requestor_1 = require_flag_configuration_requestor();
@@ -3906,256 +4757,10 @@ let eppoSdk = null;
       exports.HttpClient = http_client_1.default;
       var interfaces_1 = require_interfaces();
       Object.defineProperty(exports, "VariationType", { enumerable: true, get: function() {
-        return interfaces_1.VariationType;
-      } });
+          return interfaces_1.VariationType;
+        } });
       var validation = require_validation();
       exports.validation = validation;
-    }
-  });
-
-  // dist/storage-key-constants.js
-  var require_storage_key_constants = __commonJS({
-    "dist/storage-key-constants.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.META_KEY = exports.CONFIGURATION_KEY = void 0;
-      exports.CONFIGURATION_KEY = "eppo-configuration";
-      exports.META_KEY = "eppo-configuration-meta";
-    }
-  });
-
-  // dist/chrome-storage-engine.js
-  var require_chrome_storage_engine = __commonJS({
-    "dist/chrome-storage-engine.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.ChromeStorageEngine = void 0;
-      var storage_key_constants_1 = require_storage_key_constants();
-      var ChromeStorageEngine = class {
-        constructor(storageArea, storageKeySuffix) {
-          this.storageArea = storageArea;
-          this.getContentsJsonString = async () => {
-            var _a;
-            const storageSubset = await this.storageArea.get(this.contentsKey);
-            return (_a = storageSubset === null || storageSubset === void 0 ? void 0 : storageSubset[this.contentsKey]) !== null && _a !== void 0 ? _a : null;
-          };
-          this.getMetaJsonString = async () => {
-            var _a;
-            const storageSubset = await this.storageArea.get(this.metaKey);
-            return (_a = storageSubset === null || storageSubset === void 0 ? void 0 : storageSubset[this.metaKey]) !== null && _a !== void 0 ? _a : null;
-          };
-          this.setContentsJsonString = async (configurationJsonString) => {
-            await this.storageArea.set({
-              [this.contentsKey]: configurationJsonString
-            });
-          };
-          this.setMetaJsonString = async (metaJsonString) => {
-            await this.storageArea.set({
-              [this.metaKey]: metaJsonString
-            });
-          };
-          const keySuffix = storageKeySuffix ? `-${storageKeySuffix}` : "";
-          this.contentsKey = storage_key_constants_1.CONFIGURATION_KEY + keySuffix;
-          this.metaKey = storage_key_constants_1.META_KEY + keySuffix;
-        }
-      };
-      exports.ChromeStorageEngine = ChromeStorageEngine;
-    }
-  });
-
-  // dist/isolatable-hybrid.store.js
-  var require_isolatable_hybrid_store = __commonJS({
-    "dist/isolatable-hybrid.store.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.IsolatableHybridConfigurationStore = void 0;
-      var js_client_sdk_common_1 = require_dist();
-      var IsolatableHybridConfigurationStore = class extends js_client_sdk_common_1.HybridConfigurationStore {
-        constructor(servingStore, persistentStore, servingStoreUpdateStrategy = "always") {
-          super(servingStore, persistentStore);
-          this.servingStoreUpdateStrategy = servingStoreUpdateStrategy;
-        }
-        /** @Override */
-        async setEntries(entries) {
-          var _a;
-          if (this.persistentStore) {
-            await this.persistentStore.setEntries(entries);
-          }
-          const persistentStoreIsExpired = !this.persistentStore || await this.persistentStore.isExpired();
-          const servingStoreIsEmpty = !((_a = this.servingStore.getKeys()) === null || _a === void 0 ? void 0 : _a.length);
-          const updateServingStore = this.servingStoreUpdateStrategy === "always" || persistentStoreIsExpired && this.servingStoreUpdateStrategy === "expired" || persistentStoreIsExpired && servingStoreIsEmpty;
-          if (updateServingStore) {
-            this.servingStore.setEntries(entries);
-          }
-        }
-      };
-      exports.IsolatableHybridConfigurationStore = IsolatableHybridConfigurationStore;
-    }
-  });
-
-  // dist/local-storage-engine.js
-  var require_local_storage_engine = __commonJS({
-    "dist/local-storage-engine.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LocalStorageEngine = void 0;
-      var storage_key_constants_1 = require_storage_key_constants();
-      var LocalStorageEngine = class {
-        constructor(localStorage, storageKeySuffix) {
-          this.localStorage = localStorage;
-          this.getContentsJsonString = async () => {
-            return this.localStorage.getItem(this.contentsKey);
-          };
-          this.getMetaJsonString = async () => {
-            return this.localStorage.getItem(this.metaKey);
-          };
-          this.setContentsJsonString = async (configurationJsonString) => {
-            this.localStorage.setItem(this.contentsKey, configurationJsonString);
-          };
-          this.setMetaJsonString = async (metaJsonString) => {
-            this.localStorage.setItem(this.metaKey, metaJsonString);
-          };
-          const keySuffix = storageKeySuffix ? `-${storageKeySuffix}` : "";
-          this.contentsKey = storage_key_constants_1.CONFIGURATION_KEY + keySuffix;
-          this.metaKey = storage_key_constants_1.META_KEY + keySuffix;
-        }
-      };
-      exports.LocalStorageEngine = LocalStorageEngine;
-    }
-  });
-
-  // dist/string-valued.store.js
-  var require_string_valued_store = __commonJS({
-    "dist/string-valued.store.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.StringValuedAsyncStore = void 0;
-      var StringValuedAsyncStore = class {
-        constructor(storageEngine, cooldownSeconds = 0) {
-          this.storageEngine = storageEngine;
-          this.cooldownSeconds = cooldownSeconds;
-          this.initialized = false;
-        }
-        isInitialized() {
-          return this.initialized;
-        }
-        async isExpired() {
-          if (!this.cooldownSeconds) {
-            return true;
-          }
-          const metaJsonString = await this.storageEngine.getMetaJsonString();
-          let isExpired = true;
-          if (metaJsonString) {
-            const parsedMeta = JSON.parse(metaJsonString);
-            const lastUpdatedAt = parsedMeta.lastUpdatedAtMs;
-            isExpired = !lastUpdatedAt || Date.now() - lastUpdatedAt > this.cooldownSeconds * 1e3;
-          }
-          return isExpired;
-        }
-        async getEntries() {
-          const contentsJsonString = await this.storageEngine.getContentsJsonString();
-          return contentsJsonString ? JSON.parse(contentsJsonString) : {};
-        }
-        async setEntries(entries) {
-          await this.storageEngine.setContentsJsonString(JSON.stringify(entries));
-          const updatedMeta = { lastUpdatedAtMs: (/* @__PURE__ */ new Date()).getTime() };
-          await this.storageEngine.setMetaJsonString(JSON.stringify(updatedMeta));
-          this.initialized = true;
-        }
-      };
-      exports.StringValuedAsyncStore = StringValuedAsyncStore;
-    }
-  });
-
-  // dist/configuration-factory.js
-  var require_configuration_factory = __commonJS({
-    "dist/configuration-factory.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.hasWindowLocalStorage = exports.hasChromeStorage = exports.configurationStorageFactory = void 0;
-      var js_client_sdk_common_1 = require_dist();
-      var chrome_storage_engine_1 = require_chrome_storage_engine();
-      var isolatable_hybrid_store_1 = require_isolatable_hybrid_store();
-      var local_storage_engine_1 = require_local_storage_engine();
-      var string_valued_store_1 = require_string_valued_store();
-      function configurationStorageFactory({ maxAgeSeconds = 0, servingStoreUpdateStrategy = "always", hasChromeStorage: hasChromeStorage2 = false, hasWindowLocalStorage: hasWindowLocalStorage2 = false, persistentStore = void 0, forceMemoryOnly = false }, { chromeStorage, windowLocalStorage, storageKeySuffix } = {}) {
-        if (forceMemoryOnly) {
-          return new js_client_sdk_common_1.MemoryOnlyConfigurationStore();
-        } else if (persistentStore) {
-          return new isolatable_hybrid_store_1.IsolatableHybridConfigurationStore(new js_client_sdk_common_1.MemoryStore(), persistentStore, servingStoreUpdateStrategy);
-        } else if (hasChromeStorage2 && chromeStorage) {
-          const chromeStorageEngine = new chrome_storage_engine_1.ChromeStorageEngine(chromeStorage, storageKeySuffix !== null && storageKeySuffix !== void 0 ? storageKeySuffix : "");
-          return new isolatable_hybrid_store_1.IsolatableHybridConfigurationStore(new js_client_sdk_common_1.MemoryStore(), new string_valued_store_1.StringValuedAsyncStore(chromeStorageEngine, maxAgeSeconds), servingStoreUpdateStrategy);
-        } else if (hasWindowLocalStorage2 && windowLocalStorage) {
-          const localStorageEngine = new local_storage_engine_1.LocalStorageEngine(windowLocalStorage, storageKeySuffix !== null && storageKeySuffix !== void 0 ? storageKeySuffix : "");
-          return new isolatable_hybrid_store_1.IsolatableHybridConfigurationStore(new js_client_sdk_common_1.MemoryStore(), new string_valued_store_1.StringValuedAsyncStore(localStorageEngine, maxAgeSeconds), servingStoreUpdateStrategy);
-        }
-        return new js_client_sdk_common_1.MemoryOnlyConfigurationStore();
-      }
-      exports.configurationStorageFactory = configurationStorageFactory;
-      function hasChromeStorage() {
-        return typeof chrome !== "undefined" && !!chrome.storage;
-      }
-      exports.hasChromeStorage = hasChromeStorage;
-      function hasWindowLocalStorage() {
-        try {
-          return typeof window !== "undefined" && !!window.localStorage;
-        } catch (_a) {
-          return false;
-        }
-      }
-      exports.hasWindowLocalStorage = hasWindowLocalStorage;
-    }
-  });
-
-  // dist/local-storage-assignment-cache.js
-  var require_local_storage_assignment_cache = __commonJS({
-    "dist/local-storage-assignment-cache.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LocalStorageAssignmentCache = void 0;
-      var js_client_sdk_common_1 = require_dist();
-      var configuration_factory_1 = require_configuration_factory();
-      var LocalStorageAssignmentCache = class extends js_client_sdk_common_1.AssignmentCache {
-        constructor(storageKeySuffix) {
-          super(new LocalStorageAssignmentShim(storageKeySuffix));
-        }
-      };
-      exports.LocalStorageAssignmentCache = LocalStorageAssignmentCache;
-      var LocalStorageAssignmentShim = class {
-        constructor(storageKeySuffix) {
-          const keySuffix = storageKeySuffix ? "-" + storageKeySuffix : "";
-          this.localStorageKey = "eppo-assignment" + keySuffix;
-        }
-        has(key) {
-          if (!(0, configuration_factory_1.hasWindowLocalStorage)()) {
-            return false;
-          }
-          return this.getCache().has(key);
-        }
-        get(key) {
-          var _a;
-          if (!(0, configuration_factory_1.hasWindowLocalStorage)()) {
-            return void 0;
-          }
-          return (_a = this.getCache().get(key)) !== null && _a !== void 0 ? _a : void 0;
-        }
-        set(key, value) {
-          if (!(0, configuration_factory_1.hasWindowLocalStorage)()) {
-            return;
-          }
-          const cache = this.getCache();
-          cache.set(key, value);
-          this.setCache(cache);
-        }
-        getCache() {
-          const cache = window.localStorage.getItem(this.localStorageKey);
-          return cache ? new Map(JSON.parse(cache)) : /* @__PURE__ */ new Map();
-        }
-        setCache(cache) {
-          window.localStorage.setItem(this.localStorageKey, JSON.stringify(Array.from(cache.entries())));
-        }
-      };
     }
   });
 
@@ -4163,16 +4768,14 @@ let eppoSdk = null;
   var require_package2 = __commonJS({
     "package.json"(exports, module) {
       module.exports = {
-        name: "@eppo/js-client-sdk",
-        version: "3.1.2",
-        description: "Eppo SDK for client-side JavaScript applications",
+        name: "@eppo/node-server-sdk",
+        version: "3.0.2",
+        description: "Eppo node server SDK",
         main: "dist/index.js",
         files: [
-          "/dist",
-          "/src",
-          "!*.spec.ts"
+          "/dist"
         ],
-        typings: "dist/js-client-sdk.d.ts",
+        typings: "dist/node-server-sdk.d.ts",
         scripts: {
           lint: "eslint '**/*.{ts,tsx}' '**/*.d.{ts,tsx}' --cache",
           "lint:fix": "eslint --fix '**/*.{ts,tsx}' --cache",
@@ -4184,46 +4787,46 @@ let eppoSdk = null;
           "test:unit": "NODE_ENV=test jest '.*\\.spec\\.ts'",
           docs: "api-documenter markdown -i ./temp -o ./docs"
         },
-        jsdelivr: "dist/eppo-sdk.js",
         repository: {
           type: "git",
-          url: "git+https://github.com/Eppo-exp/js-client-sdk.git"
+          url: "git+https://github.com/Eppo-exp/node-server-sdk.git"
         },
         author: "",
         license: "MIT",
         bugs: {
-          url: "https://github.com/Eppo-exp/js-client-sdk/issues"
+          url: "https://github.com/Eppo-exp/node-server-sdk/issues"
         },
-        homepage: "https://github.com/Eppo-exp/js-client-sdk#readme",
+        homepage: "https://github.com/Eppo-exp/node-server-sdk#readme",
+        dependencies: {
+          "@eppo/js-client-sdk-common": "3.2.2",
+          "lru-cache": "^10.0.1"
+        },
         devDependencies: {
+          "@google-cloud/storage": "^6.9.3",
           "@microsoft/api-documenter": "^7.23.9",
           "@microsoft/api-extractor": "^7.38.0",
-          "@types/chrome": "^0.0.268",
-          "@types/jest": "^29.5.11",
+          "@types/express": "^4.17.13",
+          "@types/jest": "^29.2.4",
           "@typescript-eslint/eslint-plugin": "^5.13.0",
           "@typescript-eslint/parser": "^5.13.0",
-          eslint: "^8.17.0",
+          eslint: "7.32.0",
           "eslint-config-prettier": "^8.5.0",
           "eslint-import-resolver-typescript": "^2.5.0",
           "eslint-plugin-import": "^2.25.4",
           "eslint-plugin-prettier": "^4.0.0",
           "eslint-plugin-promise": "^6.0.0",
-          husky: "^8.0.1",
+          express: "^4.18.0",
+          husky: "^6.0.0",
           jest: "^29.7.0",
-          "jest-environment-jsdom": "^29.7.0",
           "lint-staged": "^12.3.5",
-          prettier: "^2.7.1",
-          "terser-webpack-plugin": "^5.3.3",
-          testdouble: "^3.16.6",
-          "ts-jest": "^29.1.1",
-          "ts-loader": "^9.3.1",
-          "ts-node": "^10.9.2",
-          typescript: "^4.7.4",
-          webpack: "^5.73.0",
-          "webpack-cli": "^4.10.0"
+          prettier: "^2.2.1",
+          testdouble: "^3.16.4",
+          "ts-jest": "^29.0.0",
+          typescript: "^4.2.4"
         },
-        dependencies: {
-          "@eppo/js-client-sdk-common": "3.2.2"
+        engines: {
+          node: ">=18.x",
+          yarn: "1.x"
         }
       };
     }
@@ -4237,7 +4840,7 @@ let eppoSdk = null;
       exports.sdkName = exports.sdkVersion = void 0;
       var packageJson = require_package2();
       exports.sdkVersion = packageJson.version;
-      exports.sdkName = "js-client-sdk";
+      exports.sdkName = "node-server-sdk";
     }
   });
 
@@ -4245,143 +4848,38 @@ let eppoSdk = null;
   var require_dist2 = __commonJS({
     "dist/index.js"(exports) {
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.getInstance = exports.init = exports.EppoJSClient = exports.ChromeStorageEngine = void 0;
+      exports.getInstance = exports.init = void 0;
       var js_client_sdk_common_1 = require_dist();
-      var configuration_factory_1 = require_configuration_factory();
-      var local_storage_assignment_cache_1 = require_local_storage_assignment_cache();
       var sdk_data_1 = require_sdk_data();
-      var chrome_storage_engine_1 = require_chrome_storage_engine();
-      Object.defineProperty(exports, "ChromeStorageEngine", { enumerable: true, get: function() {
-        return chrome_storage_engine_1.ChromeStorageEngine;
-      } });
-      var configurationStore = (0, configuration_factory_1.configurationStorageFactory)({
-        forceMemoryOnly: true
-      });
-      var EppoJSClient = class _EppoJSClient extends js_client_sdk_common_1.EppoClient {
-        getStringAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          _EppoJSClient.getAssignmentInitializationCheck();
-          return super.getStringAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        /**
-         * @deprecated Use getBooleanAssignment instead
-         */
-        getBoolAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          return this.getBooleanAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        getBooleanAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          _EppoJSClient.getAssignmentInitializationCheck();
-          return super.getBooleanAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        getIntegerAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          _EppoJSClient.getAssignmentInitializationCheck();
-          return super.getIntegerAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        getNumericAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          _EppoJSClient.getAssignmentInitializationCheck();
-          return super.getNumericAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        getJSONAssignment(flagKey, subjectKey, subjectAttributes, defaultValue) {
-          _EppoJSClient.getAssignmentInitializationCheck();
-          return super.getJSONAssignment(flagKey, subjectKey, subjectAttributes, defaultValue);
-        }
-        static getAssignmentInitializationCheck() {
-          if (!_EppoJSClient.initialized) {
-            console.warn("Eppo SDK assignment requested before init() completed");
-          }
-        }
-      };
-      exports.EppoJSClient = EppoJSClient;
-      EppoJSClient.instance = new EppoJSClient(configurationStore, void 0, true);
-      EppoJSClient.initialized = false;
+      var clientInstance;
       async function init(config) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f;
         js_client_sdk_common_1.validation.validateNotBlank(config.apiKey, "API key required");
-        let initializationError;
-        try {
-          EppoJSClient.instance.stopPolling();
-          EppoJSClient.instance.setLogger(config.assignmentLogger);
-          const storageKeySuffix = config.apiKey.replace(/\W/g, "").substring(0, 8);
-          EppoJSClient.instance.useCustomAssignmentCache(new local_storage_assignment_cache_1.LocalStorageAssignmentCache(storageKeySuffix));
-          const configurationStore2 = (0, configuration_factory_1.configurationStorageFactory)({
-            maxAgeSeconds: config.maxCacheAgeSeconds,
-            servingStoreUpdateStrategy: config.updateOnFetch,
-            persistentStore: config.persistentStore,
-            hasChromeStorage: (0, configuration_factory_1.hasChromeStorage)(),
-            hasWindowLocalStorage: (0, configuration_factory_1.hasWindowLocalStorage)()
-          }, {
-            chromeStorage: (0, configuration_factory_1.hasChromeStorage)() ? chrome.storage.local : void 0,
-            windowLocalStorage: (0, configuration_factory_1.hasWindowLocalStorage)() ? window.localStorage : void 0,
-            storageKeySuffix
-          });
-          EppoJSClient.instance.setConfigurationStore(configurationStore2);
-          const requestConfiguration = {
-            apiKey: config.apiKey,
-            sdkName: sdk_data_1.sdkName,
-            sdkVersion: sdk_data_1.sdkVersion,
-            baseUrl: (_a = config.baseUrl) !== null && _a !== void 0 ? _a : void 0,
-            requestTimeoutMs: (_b = config.requestTimeoutMs) !== null && _b !== void 0 ? _b : void 0,
-            numInitialRequestRetries: (_c = config.numInitialRequestRetries) !== null && _c !== void 0 ? _c : void 0,
-            numPollRequestRetries: (_d = config.numPollRequestRetries) !== null && _d !== void 0 ? _d : void 0,
-            pollAfterSuccessfulInitialization: (_e = config.pollAfterSuccessfulInitialization) !== null && _e !== void 0 ? _e : false,
-            pollAfterFailedInitialization: (_f = config.pollAfterFailedInitialization) !== null && _f !== void 0 ? _f : false,
-            throwOnFailedInitialization: true,
-            skipInitialPoll: (_g = config.skipInitialRequest) !== null && _g !== void 0 ? _g : false
-          };
-          EppoJSClient.instance.setConfigurationRequestParameters(requestConfiguration);
-          let initFromConfigStoreError = void 0;
-          let initFromFetchError = void 0;
-          const attemptInitFromConfigStore = configurationStore2.init().then(async () => {
-            if (!configurationStore2.getKeys().length) {
-              console.warn("Eppo SDK cached configuration is empty");
-              initFromConfigStoreError = new Error("Configuration store was empty");
-              return "";
-            }
-            const cacheIsExpired = await configurationStore2.isExpired();
-            if (cacheIsExpired && !config.useExpiredCache) {
-              console.warn("Eppo SDK set not to use expired cached configuration");
-              initFromConfigStoreError = new Error("Configuration store was expired");
-              return "";
-            }
-            return "config store";
-          }).catch((e) => {
-            console.warn("Eppo SDK encountered an error initializing from the configuration store", e);
-            initFromConfigStoreError = e;
-          });
-          const attemptInitFromFetch = EppoJSClient.instance.fetchFlagConfigurations().then(() => {
-            return "fetch";
-          }).catch((e) => {
-            console.warn("Eppo SDK encountered an error initializing from fetching", e);
-            initFromFetchError = e;
-          });
-          let initializationSource = await Promise.race([
-            attemptInitFromConfigStore,
-            attemptInitFromFetch
-          ]);
-          if (!initializationSource) {
-            if (!initFromConfigStoreError) {
-              initializationSource = await attemptInitFromConfigStore;
-            } else {
-              initializationSource = await attemptInitFromFetch;
-            }
-          }
-          if (!initializationSource) {
-            initializationError = initFromFetchError;
-          }
-        } catch (error) {
-          initializationError = error;
-        }
-        if (initializationError) {
-          console.warn("Eppo SDK was unable to initialize with a configuration, assignment calls will return the default value and not be logged" + (config.pollAfterFailedInitialization ? " until an experiment configuration is successfully retrieved" : ""));
-          if ((_h = config.throwOnFailedInitialization) !== null && _h !== void 0 ? _h : true) {
-            throw initializationError;
-          }
-        }
-        EppoJSClient.initialized = true;
-        return EppoJSClient.instance;
+        const configurationStore = new js_client_sdk_common_1.MemoryOnlyConfigurationStore();
+        const requestConfiguration = {
+          apiKey: config.apiKey,
+          sdkName: sdk_data_1.sdkName,
+          sdkVersion: sdk_data_1.sdkVersion,
+          baseUrl: (_a = config.baseUrl) !== null && _a !== void 0 ? _a : void 0,
+          requestTimeoutMs: (_b = config.requestTimeoutMs) !== null && _b !== void 0 ? _b : void 0,
+          numInitialRequestRetries: (_c = config.numInitialRequestRetries) !== null && _c !== void 0 ? _c : void 0,
+          numPollRequestRetries: (_d = config.numPollRequestRetries) !== null && _d !== void 0 ? _d : void 0,
+          pollAfterSuccessfulInitialization: true,
+          pollAfterFailedInitialization: (_e = config.pollAfterFailedInitialization) !== null && _e !== void 0 ? _e : false,
+          throwOnFailedInitialization: (_f = config.throwOnFailedInitialization) !== null && _f !== void 0 ? _f : true
+        };
+        clientInstance = new js_client_sdk_common_1.EppoClient(configurationStore, requestConfiguration);
+        clientInstance.setLogger(config.assignmentLogger);
+        clientInstance.useLRUInMemoryAssignmentCache(5e4);
+        await clientInstance.fetchFlagConfigurations();
+        return clientInstance;
       }
       exports.init = init;
       function getInstance() {
-        return EppoJSClient.instance;
+        if (!clientInstance) {
+          throw Error("Expected init() to be called to initialize a client instance");
+        }
+        return clientInstance;
       }
       exports.getInstance = getInstance;
     }

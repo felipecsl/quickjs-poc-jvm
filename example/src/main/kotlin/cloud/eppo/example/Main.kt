@@ -1,12 +1,35 @@
 package cloud.eppo.example
 
+import cloud.eppo.example.quickjs.JSCallFunction
+import cloud.eppo.example.quickjs.JSFunction
 import cloud.eppo.example.quickjs.QuickJSContext
+import cloud.eppo.example.quickjs.QuickJSContext.DefaultModuleLoader
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 
 fun main() {
   val osArch = System.getProperty("os.arch")
   println("OS Architecture: $osArch")
   NativeLibraryLoader.loadLibrary("libeppojs.so")
   val context: QuickJSContext = QuickJSContext.create()
+  context.moduleLoader = object : DefaultModuleLoader() {
+    override fun getModuleStringCode(moduleName: String): String {
+      println("Loading module: $moduleName")
+      return ""
+    }
+  }
+  context.setProperty(context.globalObject, "setTimeout", JSCallFunction { args ->
+    val argFunc = args[0] as JSFunction
+    val delay = args[1] as Long
+    val executor = Executors.newSingleThreadScheduledExecutor()
+    val task = Runnable {
+      context.call(argFunc, argFunc.objPointer, context.globalObject)
+    }
+    executor.schedule(task, delay, TimeUnit.MILLISECONDS)
+    null
+  })
+
   val console = object : QuickJSContext.Console {
     override fun log(message: String) {
       println("console.log: $message")
@@ -25,7 +48,7 @@ fun main() {
     }
   }
   context.setConsole(console)
-  val eppoBundle = Main::class.java.getResourceAsStream("/index.js")?.bufferedReader()?.readText()
+  val eppoBundle = Main::class.java.getResourceAsStream("/index.mjs")?.bufferedReader()?.readText()
   val script = """
     const assignmentLogger = {
       logAssignment(assignment) {
@@ -41,6 +64,7 @@ fun main() {
       apiKey: "$sdkKey",
       assignmentLogger,
     }).then(() => {
+      console.log("sdk initialized");
       const eppoClient = eppoSdk.getInstance();
       const variation = eppoClient.getStringAssignment(
         "llama3_vs_gpt4o",
@@ -49,10 +73,13 @@ fun main() {
         "fooBar",
       );
       console.log("variation: " + variation);
-    });
+    }).catch((error) => {
+      console.error("sdk failed to initialize", error);
+    })
   """.trimIndent()
   if (eppoBundle != null) {
-    context.evaluate("$eppoBundle\n$script")
+    val code = context.compileModule("$eppoBundle\n$script")
+    context.execute(code)
   } else {
     throw RuntimeException("Failed to load script")
   }

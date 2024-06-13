@@ -315,7 +315,7 @@ public class QuickJSContext {
     set(context, jsArray.getPointer(), value, index);
   }
 
-  Object call(JSObject func, long objPointer, Object... args) {
+  public Object call(JSObject func, long objPointer, Object... args) {
     checkSameThread();
     checkDestroyed();
 
