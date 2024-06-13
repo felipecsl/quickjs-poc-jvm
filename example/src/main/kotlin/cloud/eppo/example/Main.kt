@@ -2,11 +2,10 @@ package cloud.eppo.example
 
 import cloud.eppo.example.quickjs.QuickJSContext
 
-
 fun main() {
   val osArch = System.getProperty("os.arch")
-  println("Operating System Architecture: $osArch")
-  System.load("/Users/felipecsl/prj/quickjs-poc-jvm/native/libs/arm64/libeppojs.so")
+  println("OS Architecture: $osArch")
+  NativeLibraryLoader.loadLibrary("libeppojs.so")
   val context: QuickJSContext = QuickJSContext.create()
   val console = object : QuickJSContext.Console {
     override fun log(message: String) {
@@ -26,6 +25,26 @@ fun main() {
     }
   }
   context.setConsole(console)
-  context.evaluate("console.log(1 + 2);")
+  val script = """
+    function add(a, b) {
+      return a + b;
+    }
+    function sub(a, b) {
+      return a - b;
+    }
+    class EppoCalculator {
+      constructor() {
+      }
+      add(a, b) {
+        return add(a, b);
+      }
+      sub(a, b) {
+        return sub(a, b);
+      }
+    }
+    const calc = new EppoCalculator();
+    console.log(calc.sub(calc.add(10, 25), 5));
+  """.trimIndent()
+  context.evaluate(script)
   println("All set!")
 }

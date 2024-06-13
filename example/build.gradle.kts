@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.net.URI
 
 plugins {
@@ -11,6 +12,14 @@ version = "1.0-SNAPSHOT"
 
 application {
   mainClass.set("cloud.eppo.example.MainKt")
+}
+
+tasks {
+  named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+    append("native/libeppojs.so")
+    append("native/libquickjs.so")
+  }
 }
 
 repositories {
