@@ -6,7 +6,7 @@ import cloud.eppo.example.quickjs.QuickJSContext
 fun main() {
   val osArch = System.getProperty("os.arch")
   println("Operating System Architecture: $osArch")
-  System.load("/Users/felipecsl/prj/eppo-jvm-example/native/libs/arm64/libeppojs.dylib")
+  System.load("/Users/felipecsl/prj/quickjs-poc-jvm/native/libs/arm64/libeppojs.dylib")
   val context: QuickJSContext = QuickJSContext.create()
   context.evaluate("console.log(1 + 2);")
   val console = object : QuickJSContext.Console {

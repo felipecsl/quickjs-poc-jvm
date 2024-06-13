@@ -95,7 +95,7 @@ static void throwJSException(JNIEnv *env, const char* msg) {
         return;
     }
 
-    jclass e = env->FindClass("com/whl/quickjs/wrapper/QuickJSException");
+    jclass e = env->FindClass("cloud/eppo/example/quickjs/QuickJSException");
     jmethodID init = env->GetMethodID(e, "<init>", "(Ljava/lang/String;Z)V");
     jstring ret = env->NewStringUTF(msg);
     auto t = (jthrowable)env->NewObject(e, init, ret, JNI_TRUE);
@@ -149,7 +149,7 @@ static char *jsModuleNormalizeFunc(JSContext *ctx, const char *module_base_name,
     auto env = wrapper->jniEnv;
 
     // module loader handle.
-    jobject moduleLoader = env->CallObjectMethod(wrapper->jniThiz, env->GetMethodID(wrapper->quickjsContextClass, "getModuleLoader", "()Lcom/whl/quickjs/wrapper/ModuleLoader;"));
+    jobject moduleLoader = env->CallObjectMethod(wrapper->jniThiz, env->GetMethodID(wrapper->quickjsContextClass, "getModuleLoader", "()Lcloud/eppo/example/quickjs/ModuleLoader;"));
     if (moduleLoader == nullptr) {
         JS_ThrowInternalError(ctx, "Failed to load module, the ModuleLoader can not be null!");
         return nullptr;
@@ -179,7 +179,7 @@ jsModuleLoaderFunc(JSContext *ctx, const char *module_name, void *opaque) {
     auto arg = env->NewStringUTF(module_name);
 
     // module loader handle.
-    jobject moduleLoader = env->CallObjectMethod(wrapper->jniThiz, env->GetMethodID(wrapper->quickjsContextClass, "getModuleLoader", "()Lcom/whl/quickjs/wrapper/ModuleLoader;"));
+    jobject moduleLoader = env->CallObjectMethod(wrapper->jniThiz, env->GetMethodID(wrapper->quickjsContextClass, "getModuleLoader", "()Lcloud/eppo/example/quickjs/ModuleLoader;"));
     if (moduleLoader == nullptr) {
         JS_ThrowInternalError(ctx, "Failed to load module, the ModuleLoader can not be null!");
         return (JSModuleDef *) JS_VALUE_GET_PTR(JS_EXCEPTION);
@@ -318,12 +318,12 @@ QuickJSWrapper::QuickJSWrapper(JNIEnv *env, jobject thiz, JSRuntime *rt) {
     longClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("java/lang/Long")));
     doubleClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("java/lang/Double")));
     stringClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("java/lang/String")));
-    jsObjectClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/JSObject")));
-    jsArrayClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/JSArray")));
-    jsFunctionClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/JSFunction")));
-    jsCallFunctionClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/JSCallFunction")));
-    quickjsContextClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/QuickJSContext")));
-    moduleLoaderClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("com/whl/quickjs/wrapper/ModuleLoader")));
+    jsObjectClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/JSObject")));
+    jsArrayClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/JSArray")));
+    jsFunctionClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/JSFunction")));
+    jsCallFunctionClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/JSCallFunction")));
+    quickjsContextClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/QuickJSContext")));
+    moduleLoaderClass = (jclass)(jniEnv->NewGlobalRef(jniEnv->FindClass("cloud/eppo/example/quickjs/ModuleLoader")));
 
     booleanValueOf = jniEnv->GetStaticMethodID(booleanClass, "valueOf", "(Z)Ljava/lang/Boolean;");
     integerValueOf = jniEnv->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
@@ -336,9 +336,9 @@ QuickJSWrapper::QuickJSWrapper(JNIEnv *env, jobject thiz, JSRuntime *rt) {
     doubleGetValue = jniEnv->GetMethodID(doubleClass, "doubleValue", "()D");
     jsObjectGetValue = jniEnv->GetMethodID(jsObjectClass, "getPointer", "()J");
 
-    jsObjectInit = jniEnv->GetMethodID(jsObjectClass, "<init>", "(Lcom/whl/quickjs/wrapper/QuickJSContext;J)V");
-    jsArrayInit = jniEnv->GetMethodID(jsArrayClass, "<init>", "(Lcom/whl/quickjs/wrapper/QuickJSContext;J)V");
-    jsFunctionInit = jniEnv->GetMethodID(jsFunctionClass, "<init>","(Lcom/whl/quickjs/wrapper/QuickJSContext;JJ)V");
+    jsObjectInit = jniEnv->GetMethodID(jsObjectClass, "<init>", "(Lcloud/eppo/example/quickjs/QuickJSContext;J)V");
+    jsArrayInit = jniEnv->GetMethodID(jsArrayClass, "<init>", "(Lcloud/eppo/example/quickjs/QuickJSContext;J)V");
+    jsFunctionInit = jniEnv->GetMethodID(jsFunctionClass, "<init>","(Lcloud/eppo/example/quickjs/QuickJSContext;JJ)V");
 
     callFunctionBackM = jniEnv->GetMethodID(quickjsContextClass, "callFunctionBack", "(I[Ljava/lang/Object;)Ljava/lang/Object;");
     removeCallFunctionM = jniEnv->GetMethodID(quickjsContextClass, "removeCallFunction", "(I)V");
