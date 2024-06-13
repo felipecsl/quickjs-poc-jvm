@@ -6,26 +6,26 @@ import cloud.eppo.example.quickjs.QuickJSContext
 fun main() {
   val osArch = System.getProperty("os.arch")
   println("Operating System Architecture: $osArch")
-  System.load("/Users/felipecsl/prj/quickjs-poc-jvm/native/libs/arm64/libeppojs.dylib")
+  System.load("/Users/felipecsl/prj/quickjs-poc-jvm/native/libs/arm64/libeppojs.so")
   val context: QuickJSContext = QuickJSContext.create()
-  context.evaluate("console.log(1 + 2);")
   val console = object : QuickJSContext.Console {
     override fun log(message: String) {
-      println("log: $message")
+      println("console.log: $message")
     }
 
     override fun info(message: String?) {
-      println("info: $message")
+      println("console.info: $message")
     }
 
     override fun warn(message: String?) {
-      println("warn: $message")
+      println("console.warn: $message")
     }
 
     override fun error(message: String?) {
-      println("error: $message")
+      println("console.error: $message")
     }
   }
   context.setConsole(console)
-  println("Hello World!")
+  context.evaluate("console.log(1 + 2);")
+  println("All set!")
 }
