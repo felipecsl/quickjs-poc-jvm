@@ -27,7 +27,29 @@ fun main() {
   context.setConsole(console)
   val eppoBundle = Main::class.java.getResourceAsStream("/index.js")?.bufferedReader()?.readText()
   val script = """
-    console.log(eppoSdk.getInstance());
+    const assignmentLogger = {
+      logAssignment(assignment) {
+        console.log({
+          userId: assignment.subject,
+          event: "Eppo Randomized Assignment",
+          type: "track",
+          properties: { ...assignment },
+        });
+      },
+    };
+    eppoSdk.init({
+      apiKey: "$sdkKey",
+      assignmentLogger,
+    }).then(() => {
+      const eppoClient = eppoSdk.getInstance();
+      const variation = eppoClient.getStringAssignment(
+        "llama3_vs_gpt4o",
+        "subject-key",
+        {},
+        "fooBar",
+      );
+      console.log("variation: " + variation);
+    });
   """.trimIndent()
   if (eppoBundle != null) {
     context.evaluate("$eppoBundle\n$script")
